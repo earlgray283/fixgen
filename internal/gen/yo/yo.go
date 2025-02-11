@@ -6,12 +6,13 @@ import (
 	"regexp"
 	"strings"
 
+	yo_loaders "go.mercari.io/yo/loaders"
+	"go.mercari.io/yo/models"
+
 	"github.com/earlgray283/fixgen/internal"
 	"github.com/earlgray283/fixgen/internal/caseconv"
 	"github.com/earlgray283/fixgen/internal/gen"
 	"github.com/earlgray283/fixgen/internal/loaders"
-	yo_loaders "go.mercari.io/yo/loaders"
-	"go.mercari.io/yo/models"
 )
 
 type Generator struct {

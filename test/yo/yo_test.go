@@ -4,10 +4,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/earlgray283/fixgen/internal/gen"
-	gen_yo "github.com/earlgray283/fixgen/internal/gen/yo"
 	goldiev2 "github.com/sebdah/goldie/v2"
 	"github.com/stretchr/testify/require"
+
+	"github.com/earlgray283/fixgen/internal/gen"
+	gen_yo "github.com/earlgray283/fixgen/internal/gen/yo"
 )
 
 func Test_GoldenTest_yo(t *testing.T) {

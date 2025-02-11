@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/entc/load"
+
 	"github.com/earlgray283/fixgen/internal"
 	"github.com/earlgray283/fixgen/internal/caseconv"
 	"github.com/earlgray283/fixgen/internal/gen"

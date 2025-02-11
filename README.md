@@ -30,7 +30,7 @@ fixgen yo
 | Tool Name | Repository URL                                | Support | Experimental |
 | --------- | --------------------------------------------- | ------- | ------------ |
 | yo        | <https://github.com/cloudspannerecosystem/yo> | Yes     | Yes          |
-| ent       | <https://github.com/ent/ent>                  | WIP     | Yes          |
+| ent       | <https://github.com/ent/ent>                  | Yes     | Yes          |
 
 ## Examples
 

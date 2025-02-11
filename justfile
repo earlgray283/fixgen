@@ -1,18 +1,17 @@
 spannerContainerName := "fixgen-spanner"
 
+fmt:
+    @goimports -w -local="github.com/earlgray283/fixgen" .
+    @dprint fmt
+
 test:
     @go test -v ./...
 
-golden-test: golden-test-ent golden-test-yo
+test-golden:
+    @go test ./test/... -run="^Test_GoldenTest"
 
-golden-test-update:
+update-golden-test:
     @go test ./test/... -run="^Test_GoldenTest" -update
-
-golden-test-ent:
-    @go test -v ./test/ent/...
-
-golden-test-yo:
-    @go test -v ./test/yo/...
 
 build-spanner-image:
     @docker build -t fixgen-spanner:latest -f ./dockerfiles/Dockerfile_spanner . 
