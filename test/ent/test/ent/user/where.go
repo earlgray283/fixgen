@@ -60,6 +60,11 @@ func Name(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldName, v))
 }
 
+// Bytes applies equality check predicate on the "bytes" field. It's identical to BytesEQ.
+func Bytes(v []byte) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldBytes, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldCreatedAt, v))
@@ -133,6 +138,46 @@ func NameEqualFold(v string) predicate.User {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldName, v))
+}
+
+// BytesEQ applies the EQ predicate on the "bytes" field.
+func BytesEQ(v []byte) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldBytes, v))
+}
+
+// BytesNEQ applies the NEQ predicate on the "bytes" field.
+func BytesNEQ(v []byte) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldBytes, v))
+}
+
+// BytesIn applies the In predicate on the "bytes" field.
+func BytesIn(vs ...[]byte) predicate.User {
+	return predicate.User(sql.FieldIn(FieldBytes, vs...))
+}
+
+// BytesNotIn applies the NotIn predicate on the "bytes" field.
+func BytesNotIn(vs ...[]byte) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldBytes, vs...))
+}
+
+// BytesGT applies the GT predicate on the "bytes" field.
+func BytesGT(v []byte) predicate.User {
+	return predicate.User(sql.FieldGT(FieldBytes, v))
+}
+
+// BytesGTE applies the GTE predicate on the "bytes" field.
+func BytesGTE(v []byte) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldBytes, v))
+}
+
+// BytesLT applies the LT predicate on the "bytes" field.
+func BytesLT(v []byte) predicate.User {
+	return predicate.User(sql.FieldLT(FieldBytes, v))
+}
+
+// BytesLTE applies the LTE predicate on the "bytes" field.
+func BytesLTE(v []byte) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldBytes, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

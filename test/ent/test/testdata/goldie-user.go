@@ -16,17 +16,19 @@ func CreateUser(t *testing.T, db *ent_gen.Client, ovrTbl ent_gen.User) *ent_gen.
 	t.Helper()
 
 	tbl := &ent_gen.User{
-		ID:   rand.Int64(),
-		Name: lo.RandomString(32, lo.AlphanumericCharset),
+		ID:    rand.Int64(),
+		Name:  lo.RandomString(32, lo.AlphanumericCharset),
+		Bytes: []byte(lo.RandomString(32, lo.AlphanumericCharset)),
 	}
 
 	createdTbl, err := db.User.Create().
 		SetID(tbl.ID).
 		SetName(tbl.Name).
+		SetBytes(tbl.Bytes).
 		SetUpdatedAt(*tbl.UpdatedAt).
 		Save(context.Background())
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return createdTbl

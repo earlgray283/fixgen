@@ -18,6 +18,7 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id"),
 		field.String("name"),
+		field.Bytes("bytes"),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Nillable().Optional().UpdateDefault(time.Now),
 	}

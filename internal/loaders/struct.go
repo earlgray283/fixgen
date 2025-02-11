@@ -107,7 +107,8 @@ func resolveType(name string, exprType ast.Expr) (typ string, defaultValue strin
 		if err != nil {
 			return "", "", err
 		}
-		return fmt.Sprintf("[]%s", resolved), "", nil
+		typ := fmt.Sprintf("[]%s", resolved)
+		return typ, defaultValueMap[typ], nil
 	default:
 		return "", "", fixgen_errors.NewUnsupportedTypeError(name, fmt.Sprintf("%T", exprType))
 	}

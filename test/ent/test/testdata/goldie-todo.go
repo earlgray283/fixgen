@@ -29,7 +29,7 @@ func CreateTodo(t *testing.T, db *ent_gen.Client, ovrTbl ent_gen.Todo) *ent_gen.
 		SetDoneAt(*tbl.DoneAt).
 		Save(context.Background())
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	return createdTbl
