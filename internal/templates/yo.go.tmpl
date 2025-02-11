@@ -1,0 +1,35 @@
+package {{.PackageName}}
+
+import (
+  "testing"
+  "math/rand/v2"
+  "time"
+  "context"
+
+  yo_gen "{{.GenPkgPath}}"
+  "cloud.google.com/go/spanner"
+  "github.com/samber/lo"
+)
+
+func Create{{.TableName}}(t *testing.T, db *spanner.Client, ovrTbl *yo_gen.{{.TableName}}) *yo_gen.{{.TableName}} {
+  t.Helper()
+
+  tbl := &yo_gen.{{.TableName}} { {{ range $i, $f := .Fields }}
+      {{ if not $f.IsSpannerNullType }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ end }} {{ end }}
+  }
+
+  {{ range $i, $f := .Fields }} if {{ if $f.IsSpannerNullType }} !ovrTbl.{{ $f.Name }}.IsNull() {{ else }} isOverWritten(ovrTbl.{{ $f.Name }}) {{ end }} {
+      {{ if $f.AllowCommitTimestamp }} t.Fatal("spanner.CommitTimestamp should be used") {{ else }} tbl.{{ $f.Name }} = ovrTbl.{{ $f.Name }} {{end}}
+  }
+  {{ end }}
+
+  _, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+    return tx.BufferWrite([]*spanner.Mutation{tbl.Insert(ctx)})
+  })
+  if err != nil {
+    t.Fatal(err)
+  }
+
+  return tbl
+}
+

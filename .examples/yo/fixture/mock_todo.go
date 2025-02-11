@@ -1,0 +1,51 @@
+package fixture
+
+import (
+	"context"
+	"math/rand/v2"
+	"testing"
+
+	yo_gen "yo/models"
+
+	"cloud.google.com/go/spanner"
+	"github.com/samber/lo"
+)
+
+func CreateTodo(t *testing.T, db *spanner.Client, ovrTbl *yo_gen.Todo) *yo_gen.Todo {
+	t.Helper()
+
+	tbl := &yo_gen.Todo{
+		ID:          rand.Int64(),
+		Title:       lo.RandomString(32, lo.AlphanumericCharset),
+		Description: lo.RandomString(32, lo.AlphanumericCharset),
+		CreatedAt:   spanner.CommitTimestamp,
+	}
+
+	if isOverWritten(ovrTbl.ID) {
+		tbl.ID = ovrTbl.ID
+	}
+	if isOverWritten(ovrTbl.Title) {
+		tbl.Title = ovrTbl.Title
+	}
+	if isOverWritten(ovrTbl.Description) {
+		tbl.Description = ovrTbl.Description
+	}
+	if isOverWritten(ovrTbl.CreatedAt) {
+		t.Fatal("spanner.CommitTimestamp should be used")
+	}
+	if !ovrTbl.UpdatedAt.IsNull() {
+		tbl.UpdatedAt = ovrTbl.UpdatedAt
+	}
+	if !ovrTbl.DoneAt.IsNull() {
+		tbl.DoneAt = ovrTbl.DoneAt
+	}
+
+	_, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+		return tx.BufferWrite([]*spanner.Mutation{tbl.Insert(ctx)})
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return tbl
+}

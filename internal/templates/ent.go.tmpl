@@ -1,0 +1,27 @@
+package {{.PackageName}}
+
+import (
+  "testing"
+  "math/rand/v2"
+  "time"
+
+  ent_gen "{{.GenPkgPath}}"
+  "github.com/samber/lo"
+)
+
+func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, ovrTbl ent_gen.{{.TableName}}) *ent_gen.{{.TableName}} {
+  t.Helper()
+
+  tbl := &ent_gen.{{.TableName}} { {{ range $i, $dfv := .DefaultFieldValues }}
+      {{ $dfv.FieldName }}: {{ $dfv.Value }}, {{ end }}
+  }
+
+  createdTbl, err := db.{{.TableName}}.Create(). {{ range $i, $dfv := .DefaultFieldValues }}
+    Set{{ $dfv.FieldName }}({{ if $dfv.IsPointer }}*{{ end }}tbl.{{ $dfv.FieldName }}).{{ end }}
+    Save(context.Background())
+  if err != nil {
+    panic(err)
+  }
+
+  return createdTbl
+}
