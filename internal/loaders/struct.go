@@ -1,6 +1,7 @@
 package loaders
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"unicode"
 
 	fixgen_errors "github.com/earlgray283/fixgen/internal/errors"
 	"github.com/earlgray283/fixgen/internal/gen"
@@ -56,6 +58,11 @@ func LoadStructInfos(goFilePath string) ([]*gen.StructInfo, error) {
 
 		structInfo, err := parse(ts.Name.Name, st)
 		if err != nil {
+			var uerr *fixgen_errors.UnsupportedTypeError
+			if errors.As(err, &uerr) {
+				log.Printf("[WARNING] %v\n", uerr)
+				return true
+			}
 			parseErr = err
 			return false
 		}
@@ -81,26 +88,28 @@ func extractTagKeyValue(tag string) (string, string, error) {
 	return matches[1], matches[2], nil
 }
 
-func resolveType(name string, exprType ast.Expr) (string, error) {
+func resolveType(name string, exprType ast.Expr) (typ string, defaultValue string, err error) {
 	switch ty := exprType.(type) {
 	case *ast.Ident: // TODO: resolve struct type
-		return ty.Name, nil
+		typ := ty.Name
+		return typ, defaultValueMap[typ], nil
 	case *ast.SelectorExpr:
-		return ty.X.(*ast.Ident).Name + "." + ty.Sel.Name, nil
+		typ := fmt.Sprintf("%s.%s", ty.X.(*ast.Ident).Name, ty.Sel.Name)
+		return typ, defaultValueMap[typ], nil
 	case *ast.StarExpr:
-		resolved, err := resolveType(name, ty.X)
+		resolved, _, err := resolveType(name, ty.X)
 		if err != nil {
-			return "", err
+			return "", "", err
 		}
-		return fmt.Sprintf("*%s", resolved), nil
+		return fmt.Sprintf("*%s", resolved), "", nil
 	case *ast.ArrayType:
-		resolved, err := resolveType(name, ty.Elt)
+		resolved, _, err := resolveType(name, ty.Elt)
 		if err != nil {
-			return "", err
+			return "", "", err
 		}
-		return fmt.Sprintf("[]%s", resolved), nil
+		return fmt.Sprintf("[]%s", resolved), "", nil
 	default:
-		return "", fixgen_errors.NewUnsupportedTypeError(name, fmt.Sprintf("%T", exprType))
+		return "", "", fixgen_errors.NewUnsupportedTypeError(name, fmt.Sprintf("%T", exprType))
 	}
 }
 
@@ -111,7 +120,8 @@ func parse(name string, st *ast.StructType) (*gen.StructInfo, error) {
 		for _, n := range f.Names {
 			names = append(names, n.Name)
 		}
-		typ, err := resolveType(strings.Join(names, ", "), f.Type)
+
+		typ, defaultValue, err := resolveType(strings.Join(names, ", "), f.Type)
 		if err != nil {
 			return nil, fmt.Errorf("failed to resolve type: %+w", err)
 		}
@@ -136,10 +146,15 @@ func parse(name string, st *ast.StructType) (*gen.StructInfo, error) {
 			name = f.Names[0].Name
 		}
 
+		// means unexported field
+		if unicode.IsLower(rune(name[0])) {
+			continue
+		}
+
 		fields = append(fields, &gen.Field{
 			Name:         name,
 			Type:         typ,
-			DefaultValue: defaultValueMap[typ],
+			DefaultValue: defaultValue,
 			Tags:         tags,
 		})
 	}

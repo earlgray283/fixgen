@@ -1,19 +1,20 @@
-package yo
+package ent
 
 import (
 	"os"
 	"testing"
 
 	"github.com/earlgray283/fixgen/internal/gen"
-	gen_yo "github.com/earlgray283/fixgen/internal/gen/yo"
+	gen_ent "github.com/earlgray283/fixgen/internal/gen/ent"
 	goldiev2 "github.com/sebdah/goldie/v2"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_GoldenTest_yo(t *testing.T) {
+func Test_GoldenTest_ent(t *testing.T) {
+	// avoid failed to ent load: entc/load: parse schema dir: -: main module (github.com/earlgray283/fixgen) does not contain package github.com/earlgray283/fixgen/test/ent/project/ent/schema
 	require.NoError(t, os.Chdir("./test"))
 
-	g, err := gen_yo.NewGenerator()
+	g, err := gen_ent.NewGenerator()
 	require.NoError(t, err)
 
 	files, err := gen.GenerateWithFormat(g)

@@ -3,8 +3,16 @@ spannerContainerName := "fixgen-spanner"
 test:
     @go test -v ./...
 
-update-test:
+golden-test: golden-test-ent golden-test-yo
+
+golden-test-update:
     @go test ./test/... -run="^Test_GoldenTest" -update
+
+golden-test-ent:
+    @go test -v ./test/ent/...
+
+golden-test-yo:
+    @go test -v ./test/yo/...
 
 build-spanner-image:
     @docker build -t fixgen-spanner:latest -f ./dockerfiles/Dockerfile_spanner . 

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/earlgray283/fixgen/internal/gen"
+	gen_ent "github.com/earlgray283/fixgen/internal/gen/ent"
 	gen_yo "github.com/earlgray283/fixgen/internal/gen/yo"
 )
 
@@ -79,8 +80,8 @@ func main() {
 
 func loadGenerator(typ string) (gen.Generator, error) {
 	switch typ {
-	// case "ent":
-	// 	return gen_ent.NewGenerator(packageName)
+	case "ent":
+		return gen_ent.NewGenerator()
 	case "yo":
 		return gen_yo.NewGenerator()
 	default:

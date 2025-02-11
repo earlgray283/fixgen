@@ -56,7 +56,7 @@ func NewGenerator(opts ...gen.OptionFunc) (*Generator, error) {
 		}
 	}
 
-	ddlPath, err := gen.FindFilePath(opt.WorkDir, "schema.sql")
+	ddlPath, err := gen.FindFile(opt.WorkDir, "schema.sql")
 	if err != nil {
 		return nil, fmt.Errorf("failed to util.FindFilePath: %+w", err)
 	}

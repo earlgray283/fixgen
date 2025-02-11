@@ -12,15 +12,15 @@ import (
 func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, ovrTbl ent_gen.{{.TableName}}) *ent_gen.{{.TableName}} {
   t.Helper()
 
-  tbl := &ent_gen.{{.TableName}} { {{ range $i, $dfv := .DefaultFieldValues }}
-      {{ $dfv.FieldName }}: {{ $dfv.Value }}, {{ end }}
+  tbl := &ent_gen.{{.TableName}} { {{ range $i, $f := .Fields }}
+      {{ if not $f.Ignore }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ end }} {{ end }}
   }
 
-  createdTbl, err := db.{{.TableName}}.Create(). {{ range $i, $dfv := .DefaultFieldValues }}
-    Set{{ $dfv.FieldName }}({{ if $dfv.IsPointer }}*{{ end }}tbl.{{ $dfv.FieldName }}).{{ end }}
+  createdTbl, err := db.{{.TableName}}.Create(). {{ range $i, $f := .Fields }}
+    {{ if not $f.HasDefaultOnCreate }} Set{{ $f.Name }}({{ if $f.Nillable }}*{{ end }}tbl.{{ $f.Name }}).{{ end }} {{ end }}
     Save(context.Background())
   if err != nil {
-    panic(err)
+    t.Fatal(err)
   }
 
   return createdTbl
