@@ -1,8 +1,6 @@
 package {{.PackageName}}
 
-import "github.com/samber/lo"
-
-func isOverWritten[T comparable](v T) bool {
-  zero := lo.Empty[T]()
+func isModified[T comparable](v T) bool {
+  var zero T
   return v != zero
 }

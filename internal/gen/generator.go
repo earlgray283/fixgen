@@ -18,7 +18,7 @@ type StructInfo struct {
 
 type Field struct {
 	Name         string
-	Type         string
+	Type         *Type
 	DefaultValue string
 	Tags         map[string]string
 }
@@ -26,6 +26,12 @@ type Field struct {
 type File struct {
 	Name    string
 	Content []byte
+}
+
+type Type struct {
+	Name       string
+	IsNillable bool
+	IsSlice    bool
 }
 
 type Generator interface {

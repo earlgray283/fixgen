@@ -101,6 +101,13 @@ func findEntDirs(workDir string) (schemaDirPath, genDirPath string, err error) {
 
 func (g *Generator) Generate() ([]*gen.File, error) {
 	files := make([]*gen.File, 0)
+
+	commonFile, err := g.generateCommonFile()
+	if err != nil {
+		return nil, err
+	}
+	files = append(files, commonFile)
+
 	for _, si := range g.structInfos {
 		f, err := g.generate(si)
 		if err != nil {
@@ -140,7 +147,7 @@ func (g *Generator) generate(si *gen.StructInfo) (*gen.File, error) {
 			Immutable:          column.Immutable,
 			Nillable:           column.Nillable,
 			HasDefaultOnCreate: column.Default,
-			Ignore:             column.Immutable || column.Nillable || column.Default,
+			Ignore:             column.Immutable || column.Nillable || column.Default || f.DefaultValue == "",
 		})
 	}
 
@@ -182,4 +189,14 @@ type Field struct {
 	Nillable           bool
 	HasDefaultOnCreate bool
 	Ignore             bool
+}
+
+func (g *Generator) generateCommonFile() (*gen.File, error) {
+	buf := &bytes.Buffer{}
+	if err := internal.TmplCommonFile.Execute(buf, map[string]string{
+		"PackageName": g.opt.PackageName,
+	}); err != nil {
+		return nil, err
+	}
+	return &gen.File{Name: "common", Content: buf.Bytes()}, nil
 }

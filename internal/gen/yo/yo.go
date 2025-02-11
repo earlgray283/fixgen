@@ -183,7 +183,7 @@ func (g *Generator) generate(si *StructInfo) (*gen.File, error) {
 		}
 		fields = append(fields, &Field{
 			Field:                f,
-			IsSpannerNullType:    strings.HasPrefix(f.Type, "spanner.Null"),
+			IsSpannerNullType:    strings.HasPrefix(f.Type.Name, "spanner.Null"),
 			AllowCommitTimestamp: column.AllowCommitTimestamp,
 		})
 	}

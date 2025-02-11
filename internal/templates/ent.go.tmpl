@@ -9,16 +9,32 @@ import (
   "github.com/samber/lo"
 )
 
-func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, ovrTbl ent_gen.{{.TableName}}) *ent_gen.{{.TableName}} {
+func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m ent_gen.{{.TableName}}) *ent_gen.{{.TableName}} {
   t.Helper()
 
-  tbl := &ent_gen.{{.TableName}} { {{ range $i, $f := .Fields }}
-      {{ if not $f.Ignore }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ end }} {{ end }}
+  tbl := &ent_gen.{{.TableName}} { 
+    {{ range $i, $f := .Fields -}}
+      {{ if not $f.Ignore -}}
+        {{ $f.Name }}: {{ $f.DefaultValue }},
+      {{ end -}}
+    {{ end -}}
   }
 
-  createdTbl, err := db.{{.TableName}}.Create(). {{ range $i, $f := .Fields }}
-    {{ if not $f.HasDefaultOnCreate }} Set{{ $f.Name }}({{ if $f.Nillable }}*{{ end }}tbl.{{ $f.Name }}).{{ end }} {{ end }}
-    Save(context.Background())
+  {{ range $i, $f := .Fields -}}
+    if {{ if $f.Type.IsSlice -}} len(m.{{ $f.Name }}) > 0
+      {{- else if $f.Type.IsNillable -}} m.{{ $f.Name }} != nil
+      {{- else -}} isModified(m.{{ $f.Name }}) {{- end -}} {
+      tbl.{{ $f.Name }} = m.{{ $f.Name }}
+    }
+  {{ end }}
+
+  createdTbl, err := db.{{.TableName}}.Create().
+  {{ range $i, $f := .Fields -}}
+    {{ if not $f.HasDefaultOnCreate }}
+      Set{{ $f.Name }}({{- if $f.Nillable }}*{{ end -}}tbl.{{ $f.Name }}).
+    {{- end }}
+  {{- end }}
+      Save(context.Background())
   if err != nil {
     t.Fatal(err)
   }

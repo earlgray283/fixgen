@@ -12,13 +12,29 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *ent_gen.Client, ovrTbl ent_gen.User) *ent_gen.User {
+func CreateUser(t *testing.T, db *ent_gen.Client, m ent_gen.User) *ent_gen.User {
 	t.Helper()
 
 	tbl := &ent_gen.User{
 		ID:    rand.Int64(),
 		Name:  lo.RandomString(32, lo.AlphanumericCharset),
 		Bytes: []byte(lo.RandomString(32, lo.AlphanumericCharset)),
+	}
+
+	if isModified(m.ID) {
+		tbl.ID = m.ID
+	}
+	if isModified(m.Name) {
+		tbl.Name = m.Name
+	}
+	if len(m.Bytes) > 0 {
+		tbl.Bytes = m.Bytes
+	}
+	if isModified(m.CreatedAt) {
+		tbl.CreatedAt = m.CreatedAt
+	}
+	if m.UpdatedAt != nil {
+		tbl.UpdatedAt = m.UpdatedAt
 	}
 
 	createdTbl, err := db.User.Create().

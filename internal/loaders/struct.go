@@ -88,29 +88,29 @@ func extractTagKeyValue(tag string) (string, string, error) {
 	return matches[1], matches[2], nil
 }
 
-func resolveType(name string, exprType ast.Expr) (typ string, defaultValue string, err error) {
+func resolveType(name string, exprType ast.Expr) (typ *gen.Type, defaultValue string, err error) {
 	switch ty := exprType.(type) {
 	case *ast.Ident: // TODO: resolve struct type
 		typ := ty.Name
-		return typ, defaultValueMap[typ], nil
+		return &gen.Type{Name: typ}, defaultValueMap[typ], nil
 	case *ast.SelectorExpr:
 		typ := fmt.Sprintf("%s.%s", ty.X.(*ast.Ident).Name, ty.Sel.Name)
-		return typ, defaultValueMap[typ], nil
+		return &gen.Type{Name: typ}, defaultValueMap[typ], nil
 	case *ast.StarExpr:
 		resolved, _, err := resolveType(name, ty.X)
 		if err != nil {
-			return "", "", err
+			return nil, "", err
 		}
-		return fmt.Sprintf("*%s", resolved), "", nil
+		return &gen.Type{Name: fmt.Sprintf("*%s", resolved.Name), IsNillable: true}, "", nil
 	case *ast.ArrayType:
 		resolved, _, err := resolveType(name, ty.Elt)
 		if err != nil {
-			return "", "", err
+			return nil, "", err
 		}
-		typ := fmt.Sprintf("[]%s", resolved)
-		return typ, defaultValueMap[typ], nil
+		typ := fmt.Sprintf("[]%s", resolved.Name)
+		return &gen.Type{Name: typ, IsSlice: true}, defaultValueMap[typ], nil
 	default:
-		return "", "", fixgen_errors.NewUnsupportedTypeError(name, fmt.Sprintf("%T", exprType))
+		return nil, "", fixgen_errors.NewUnsupportedTypeError(name, fmt.Sprintf("%T", exprType))
 	}
 }
 
@@ -142,7 +142,7 @@ func parse(name string, st *ast.StructType) (*gen.StructInfo, error) {
 		}
 
 		// for supporting anonymous field(=type only)
-		name := typ
+		name := typ.Name
 		if len(f.Names) != 0 {
 			name = f.Names[0].Name
 		}
