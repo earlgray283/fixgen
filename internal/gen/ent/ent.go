@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -51,7 +50,6 @@ func NewGenerator(optFuncs ...gen.OptionFunc) (*Generator, error) {
 		targetStructInfos = append(targetStructInfos, structInfos...)
 	}
 
-	log.Println(schemaDirPath, genDirPath)
 	spec, err := (&load.Config{Path: schemaDirPath}).Load()
 	if err != nil {
 		return nil, fmt.Errorf("failed to ent load: %+w", err)
@@ -136,7 +134,6 @@ func (g *Generator) generate(si *gen.StructInfo) (*gen.File, error) {
 		if !ok {
 			continue
 		}
-		log.Println(sqlColumnName, column.Default, column.Nillable)
 		fields = append(fields, &Field{
 			Field:              f,
 			Immutable:          column.Immutable,

@@ -5,6 +5,6 @@ package fixture
 import "github.com/samber/lo"
 
 func isOverWritten[T comparable](v T) bool {
-  zero := lo.Empty[T]()
-  return v != zero
+	zero := lo.Empty[T]()
+	return v != zero
 }
