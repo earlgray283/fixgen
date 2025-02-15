@@ -43,7 +43,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	generator, err := loadGenerator(generatorType)
+	generator, err := loadGenerator(generatorType, ".")
 	if err != nil {
 		eprintf("failed to loadGenerator: %v\n", err)
 		os.Exit(1)
@@ -55,7 +55,7 @@ func main() {
 		}
 	}
 
-	files, err := gen.GenerateWithFormat(generator)
+	files, err := gen.GenerateWithFormat(generator, flgs.PackageName)
 	if err != nil {
 		eprintf("failed to generator.Generate: %v\n", err)
 		os.Exit(1)
@@ -78,12 +78,12 @@ func main() {
 	}
 }
 
-func loadGenerator(typ string) (gen.Generator, error) {
+func loadGenerator(typ, workDir string) (gen.Generator, error) {
 	switch typ {
 	case "ent":
-		return gen_ent.NewGenerator()
+		return gen_ent.NewGenerator(workDir)
 	case "yo":
-		return gen_yo.NewGenerator()
+		return gen_yo.NewGenerator(workDir)
 	default:
 		return nil, fmt.Errorf("unrecognized generator type: %s", typ)
 	}

@@ -1,7 +1,6 @@
 package yo
 
 import (
-	"bytes"
 	"fmt"
 	"regexp"
 	"strings"
@@ -11,13 +10,11 @@ import (
 
 	"github.com/earlgray283/fixgen/internal/caseconv"
 	"github.com/earlgray283/fixgen/internal/gen"
-	"github.com/earlgray283/fixgen/internal/loaders"
+	"github.com/earlgray283/fixgen/internal/load"
 	"github.com/earlgray283/fixgen/internal/templates"
 )
 
 type Generator struct {
-	opt *gen.Option
-
 	genDirPath    string
 	yoPackagePath string
 	structInfos   []*StructInfo
@@ -25,23 +22,20 @@ type Generator struct {
 }
 
 // NewGenerator is a constructor for the struct Generator
-func NewGenerator(opts ...gen.OptionFunc) (*Generator, error) {
-	opt := gen.DefaultOption()
-	opt.ApplyOptionFuncs(opts...)
-
-	goModulePath, err := gen.LoadGoModulePath(opt.WorkDir)
+func NewGenerator(workDir string) (*Generator, error) {
+	goModulePath, err := gen.LoadGoModulePath(workDir)
 	if err != nil {
 		return nil, fmt.Errorf(": %+w\n", err)
 	}
 
-	genDirPath, filepathList, err := gen.FindAndReadDirByFileName(opt.WorkDir, "yo_db.yo.go")
+	genDirPath, filepathList, err := gen.FindAndReadDirByFileName(workDir, "yo_db.yo.go")
 	if err != nil {
 		return nil, fmt.Errorf("failed to util.FindAndReadDirByFileName: %+w", err)
 	}
 
 	targetStructInfos := make([]*StructInfo, 0)
 	for _, p := range filepathList {
-		structInfos, err := loaders.LoadStructInfos(p)
+		structInfos, err := load.LoadStructInfos(p)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load structInfos from %s: %+w", p, err)
 		}
@@ -57,7 +51,7 @@ func NewGenerator(opts ...gen.OptionFunc) (*Generator, error) {
 		}
 	}
 
-	ddlPath, err := gen.FindFile(opt.WorkDir, "schema.sql")
+	ddlPath, err := gen.FindFile(workDir, "schema.sql")
 	if err != nil {
 		return nil, fmt.Errorf("failed to util.FindFilePath: %+w", err)
 	}
@@ -67,7 +61,6 @@ func NewGenerator(opts ...gen.OptionFunc) (*Generator, error) {
 	}
 
 	return &Generator{
-		opt:           opt,
 		genDirPath:    genDirPath,
 		yoPackagePath: strings.Join([]string{goModulePath, genDirPath}, "/"),
 		structInfos:   targetStructInfos,
@@ -91,12 +84,6 @@ func extractSQLTableNameFromComments(comments []string) string {
 func (g *Generator) Generate() ([]*gen.File, error) {
 	files := make([]*gen.File, 0, len(g.structInfos)+1)
 
-	commonFile, err := g.generateCommonFile()
-	if err != nil {
-		return nil, err
-	}
-	files = append(files, commonFile)
-
 	for _, si := range g.structInfos {
 		file, err := g.generate(si)
 		if err != nil {
@@ -104,7 +91,15 @@ func (g *Generator) Generate() ([]*gen.File, error) {
 		}
 		files = append(files, file)
 	}
+
 	return files, nil
+}
+
+func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
+	return &gen.GenPackageInfo{
+		PackagePath:  g.yoPackagePath,
+		PackageAlias: "yo_gen",
+	}
 }
 
 func (g *Generator) IsExperimental() bool {
@@ -141,23 +136,13 @@ func loadYoTables(ddlPath string) (Tables, error) {
 	return tables, nil
 }
 
-func (g *Generator) generateCommonFile() (*gen.File, error) {
-	buf := &bytes.Buffer{}
-	if err := templates.TmplCommonFile.Execute(buf, map[string]string{
-		"PackageName": g.opt.PackageName,
-	}); err != nil {
-		return nil, err
-	}
-	return &gen.File{Name: "common", Content: buf.Bytes()}, nil
-}
-
 type StructInfo struct {
-	*gen.StructInfo
+	*load.StructInfo
 	SQLTableName string
 }
 
 type Field struct {
-	*gen.Field
+	*load.Field
 	IsSpannerNullType    bool // the type is `spanner.Null{type}`
 	AllowCommitTimestamp bool
 }
@@ -188,18 +173,16 @@ func (g *Generator) generate(si *StructInfo) (*gen.File, error) {
 		})
 	}
 
-	buf := &bytes.Buffer{}
-	if err := templates.TmplMockYoFile.Execute(buf, map[string]any{
-		"PackageName": g.opt.PackageName,
-		"GenPkgPath":  g.yoPackagePath,
-		"TableName":   si.Name,
-		"Fields":      fields,
-	}); err != nil {
+	content, err := gen.ExecuteTemplate(templates.TmplMockYoFile, map[string]any{
+		"TableName": si.Name,
+		"Fields":    fields,
+	})
+	if err != nil {
 		return nil, err
 	}
 
 	return &gen.File{
 		Name:    caseconv.ConvertPascalToSnake(si.Name),
-		Content: buf.Bytes(),
+		Content: content,
 	}, nil
 }

@@ -1,4 +1,4 @@
-package loaders
+package load
 
 import (
 	"errors"
@@ -12,17 +12,16 @@ import (
 	"unicode"
 
 	fixgen_errors "github.com/earlgray283/fixgen/internal/errors"
-	"github.com/earlgray283/fixgen/internal/gen"
 )
 
-func LoadStructInfos(goFilePath string) ([]*gen.StructInfo, error) {
+func LoadStructInfos(goFilePath string) ([]*StructInfo, error) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, goFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parser.ParseFile: %+w", err)
 	}
 
-	structInfoList := make([]*gen.StructInfo, 0)
+	structInfoList := make([]*StructInfo, 0)
 	var parseErr error
 	ast.Inspect(f, func(n ast.Node) bool {
 		genDecl, ok := n.(*ast.GenDecl)
@@ -50,10 +49,6 @@ func LoadStructInfos(goFilePath string) ([]*gen.StructInfo, error) {
 		st, ok := ts.Type.(*ast.StructType)
 		if !ok {
 			return true
-		}
-
-		if ts.Name == nil {
-			log.Printf("%+v\n", st)
 		}
 
 		structInfo, err := parse(ts.Name.Name, st)
@@ -88,34 +83,34 @@ func extractTagKeyValue(tag string) (string, string, error) {
 	return matches[1], matches[2], nil
 }
 
-func resolveType(name string, exprType ast.Expr) (typ *gen.Type, defaultValue string, err error) {
+func resolveType(name string, exprType ast.Expr) (typ *Type, defaultValue string, err error) {
 	switch ty := exprType.(type) {
 	case *ast.Ident: // TODO: resolve struct type
 		typ := ty.Name
-		return &gen.Type{Name: typ}, defaultValueMap[typ], nil
+		return &Type{Name: typ}, defaultValueMap[typ], nil
 	case *ast.SelectorExpr:
 		typ := fmt.Sprintf("%s.%s", ty.X.(*ast.Ident).Name, ty.Sel.Name)
-		return &gen.Type{Name: typ}, defaultValueMap[typ], nil
+		return &Type{Name: typ}, defaultValueMap[typ], nil
 	case *ast.StarExpr:
 		resolved, _, err := resolveType(name, ty.X)
 		if err != nil {
 			return nil, "", err
 		}
-		return &gen.Type{Name: fmt.Sprintf("*%s", resolved.Name), IsNillable: true}, "", nil
+		return &Type{Name: fmt.Sprintf("*%s", resolved.Name), IsNillable: true}, "", nil
 	case *ast.ArrayType:
 		resolved, _, err := resolveType(name, ty.Elt)
 		if err != nil {
 			return nil, "", err
 		}
 		typ := fmt.Sprintf("[]%s", resolved.Name)
-		return &gen.Type{Name: typ, IsSlice: true}, defaultValueMap[typ], nil
+		return &Type{Name: typ, IsSlice: true}, defaultValueMap[typ], nil
 	default:
 		return nil, "", fixgen_errors.NewUnsupportedTypeError(name, fmt.Sprintf("%T", exprType))
 	}
 }
 
-func parse(name string, st *ast.StructType) (*gen.StructInfo, error) {
-	fields := make([]*gen.Field, 0, len(st.Fields.List))
+func parse(name string, st *ast.StructType) (*StructInfo, error) {
+	fields := make([]*Field, 0, len(st.Fields.List))
 	for _, f := range st.Fields.List {
 		names := make([]string, 0, len(f.Names))
 		for _, n := range f.Names {
@@ -152,7 +147,7 @@ func parse(name string, st *ast.StructType) (*gen.StructInfo, error) {
 			continue
 		}
 
-		fields = append(fields, &gen.Field{
+		fields = append(fields, &Field{
 			Name:         name,
 			Type:         typ,
 			DefaultValue: defaultValue,
@@ -160,7 +155,7 @@ func parse(name string, st *ast.StructType) (*gen.StructInfo, error) {
 		})
 	}
 
-	return &gen.StructInfo{
+	return &StructInfo{
 		Name:   name,
 		Fields: fields,
 	}, nil

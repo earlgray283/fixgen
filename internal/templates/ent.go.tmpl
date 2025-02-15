@@ -1,14 +1,3 @@
-package {{.PackageName}}
-
-import (
-  "testing"
-  "math/rand/v2"
-  "time"
-
-  ent_gen "{{.GenPkgPath}}"
-  "github.com/samber/lo"
-)
-
 func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m ent_gen.{{.TableName}}) *ent_gen.{{.TableName}} {
   t.Helper()
 

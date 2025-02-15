@@ -11,12 +11,14 @@ var (
 	TmplMockEntFile *template.Template
 	TmplMockYoFile  *template.Template
 	TmplCommonFile  *template.Template
+	TmplHeaderFile  *template.Template
 )
 
 func init() {
 	TmplMockEntFile = parseFS("ent.go.tmpl")
 	TmplMockYoFile = parseFS("yo.go.tmpl")
 	TmplCommonFile = parseFS("common.go.tmpl")
+	TmplHeaderFile = parseFS("header.go.tmpl")
 }
 
 func parseFS(pattern string) *template.Template {

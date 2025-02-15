@@ -1,16 +1,3 @@
-package {{.PackageName}}
-
-import (
-  "testing"
-  "math/rand/v2"
-  "time"
-  "context"
-
-  yo_gen "{{.GenPkgPath}}"
-  "cloud.google.com/go/spanner"
-  "github.com/samber/lo"
-)
-
 func Create{{.TableName}}(t *testing.T, db *spanner.Client, m *yo_gen.{{.TableName}}) *yo_gen.{{.TableName}} {
   t.Helper()
 

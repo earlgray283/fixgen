@@ -1,7 +1,6 @@
 package ent
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -9,27 +8,22 @@ import (
 	"path/filepath"
 	"strings"
 
-	"entgo.io/ent/entc/load"
+	ent_load "entgo.io/ent/entc/load"
 
 	"github.com/earlgray283/fixgen/internal/caseconv"
 	"github.com/earlgray283/fixgen/internal/gen"
-	"github.com/earlgray283/fixgen/internal/loaders"
+	"github.com/earlgray283/fixgen/internal/load"
 	"github.com/earlgray283/fixgen/internal/templates"
 )
 
 type Generator struct {
-	opt *gen.Option
-
-	genPkgPath  string
-	structInfos []*gen.StructInfo
-	tables      Tables
+	entPackagePath string
+	structInfos    []*load.StructInfo
+	tables         Tables
 }
 
-func NewGenerator(optFuncs ...gen.OptionFunc) (*Generator, error) {
-	opt := gen.DefaultOption()
-	opt.ApplyOptionFuncs(optFuncs...)
-
-	schemaDirPath, genDirPath, err := findEntDirs(opt.WorkDir)
+func NewGenerator(workDir string) (*Generator, error) {
+	schemaDirPath, genDirPath, err := findEntDirs(workDir)
 	if err != nil {
 		return nil, err
 	}
@@ -38,20 +32,20 @@ func NewGenerator(optFuncs ...gen.OptionFunc) (*Generator, error) {
 		return nil, err
 	}
 
-	targetStructInfos := make([]*gen.StructInfo, 0)
+	targetStructInfos := make([]*load.StructInfo, 0)
 	for _, e := range entries {
 		if e.IsDir() {
 			continue
 		}
 		p := filepath.Join(genDirPath, e.Name())
-		structInfos, err := loaders.LoadStructInfos(p)
+		structInfos, err := load.LoadStructInfos(p)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load structInfos from %s: %+w", p, err)
 		}
 		targetStructInfos = append(targetStructInfos, structInfos...)
 	}
 
-	spec, err := (&load.Config{Path: schemaDirPath}).Load()
+	spec, err := (&ent_load.Config{Path: schemaDirPath}).Load()
 	if err != nil {
 		return nil, fmt.Errorf("failed to ent load: %+w", err)
 	}
@@ -65,10 +59,9 @@ func NewGenerator(optFuncs ...gen.OptionFunc) (*Generator, error) {
 	}
 
 	return &Generator{
-		opt:         opt,
-		genPkgPath:  strings.Join([]string{spec.Module.Path, genDirPath}, "/"),
-		structInfos: targetStructInfos,
-		tables:      tables,
+		entPackagePath: strings.Join([]string{spec.Module.Path, genDirPath}, "/"),
+		structInfos:    targetStructInfos,
+		tables:         tables,
 	}, nil
 }
 
@@ -102,12 +95,6 @@ func findEntDirs(workDir string) (schemaDirPath, genDirPath string, err error) {
 func (g *Generator) Generate() ([]*gen.File, error) {
 	files := make([]*gen.File, 0)
 
-	commonFile, err := g.generateCommonFile()
-	if err != nil {
-		return nil, err
-	}
-	files = append(files, commonFile)
-
 	for _, si := range g.structInfos {
 		f, err := g.generate(si)
 		if err != nil {
@@ -122,11 +109,18 @@ func (g *Generator) Generate() ([]*gen.File, error) {
 	return files, nil
 }
 
+func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
+	return &gen.GenPackageInfo{
+		PackagePath:  g.entPackagePath,
+		PackageAlias: "ent_gen",
+	}
+}
+
 func (g *Generator) IsExperimental() bool {
 	return true
 }
 
-func (g *Generator) generate(si *gen.StructInfo) (*gen.File, error) {
+func (g *Generator) generate(si *load.StructInfo) (*gen.File, error) {
 	columns, ok := g.tables[si.Name]
 	if !ok {
 		return nil, nil
@@ -151,24 +145,17 @@ func (g *Generator) generate(si *gen.StructInfo) (*gen.File, error) {
 		})
 	}
 
-	buf := &bytes.Buffer{}
-	if err := templates.TmplMockEntFile.Execute(buf, map[string]any{
-		"PackageName": g.opt.PackageName,
-		"GenPkgPath":  g.genPkgPath,
-		"TableName":   si.Name,
-		"Fields":      fields,
-	}); err != nil {
-		return nil, err
-	}
-
-	formated, err := gen.Format(buf.Bytes())
+	content, err := gen.ExecuteTemplate(templates.TmplMockEntFile, map[string]any{
+		"TableName": si.Name,
+		"Fields":    fields,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	return &gen.File{
 		Name:    caseconv.ConvertPascalToSnake(si.Name),
-		Content: formated,
+		Content: content,
 	}, nil
 }
 
@@ -181,22 +168,12 @@ func extractSQLColumnName(tagValue string) string {
 }
 
 type Tables map[string]Columns
-type Columns map[string]*load.Field
+type Columns map[string]*ent_load.Field
 
 type Field struct {
-	*gen.Field
+	*load.Field
 	Immutable          bool
 	Nillable           bool
 	HasDefaultOnCreate bool
 	Ignore             bool
-}
-
-func (g *Generator) generateCommonFile() (*gen.File, error) {
-	buf := &bytes.Buffer{}
-	if err := templates.TmplCommonFile.Execute(buf, map[string]string{
-		"PackageName": g.opt.PackageName,
-	}); err != nil {
-		return nil, err
-	}
-	return &gen.File{Name: "common", Content: buf.Bytes()}, nil
 }
