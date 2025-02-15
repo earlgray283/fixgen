@@ -1,0 +1,19 @@
+fields:
+  user_name:
+    value: "山田 太郎"
+  user_id:
+    value: 'fmt.Sprintf("user-%d", rand.Int64())'
+
+custom_template:
+  filenames:
+    - "custom_template.go.tmpl"
+  value: |
+    func helper(t *testing.T) {
+      t.Helper()
+    }
+
+imports:
+  - "github.com/samber/lo"
+  - "math/rand/v2"
+  - "fmt"
+
