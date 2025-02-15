@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,7 +16,7 @@ import (
 )
 
 type Flags struct {
-	GoFilePrefix          string
+	Prefix                string
 	PackageName           string
 	DestDir               string
 	CleanIfFailed         bool
@@ -23,7 +26,7 @@ type Flags struct {
 func parseFlags() *Flags {
 	f := &Flags{}
 
-	flag.StringVar(&f.GoFilePrefix, "go-file-prefix", "mock_", "")
+	flag.StringVar(&f.Prefix, "prefix", "", "")
 	flag.StringVar(&f.PackageName, "pkgname", "fixture", "")
 	flag.StringVar(&f.DestDir, "dest-dir", ".", "the path the destination directory is created")
 	flag.BoolVar(&f.CleanIfFailed, "clean-if-failed", false, "clean the directory and files if failed")
@@ -55,20 +58,20 @@ func main() {
 		}
 	}
 
-	files, err := gen.GenerateWithFormat(generator, flgs.PackageName)
+	files, err := gen.GenerateWithFormat(generator, gen.WithPackageName(flgs.PackageName))
 	if err != nil {
 		eprintf("failed to generator.Generate: %v\n", err)
 		os.Exit(1)
 	}
 
 	packageDirPath := filepath.Join(flgs.DestDir, flgs.PackageName)
-	if err := gen.CreateDirIfNotExists(packageDirPath); err != nil {
+	if err := createDirIfNotExists(packageDirPath); err != nil {
 		eprintf("failed to CreateDirIfNotExists: %v\n", err)
 		os.Exit(1)
 	}
 	for _, f := range files {
-		fileName := buildFileName(flgs.DestDir, flgs.PackageName, flgs.GoFilePrefix, f.Name)
-		if err := gen.SaveFile(fileName, f.Content); err != nil {
+		fileName := buildFileName(flgs.DestDir, flgs.PackageName, flgs.Prefix, f.Name)
+		if err := saveFile(fileName, f.Content); err != nil {
 			if flgs.CleanIfFailed {
 				_ = os.RemoveAll(packageDirPath)
 			}
@@ -102,4 +105,30 @@ func yesNo(prompt string) bool {
 
 func buildFileName(destDir, packageName, goFilePrefix, name string) string {
 	return filepath.Join(destDir, packageName, fmt.Sprintf("%s%s.go", goFilePrefix, name))
+}
+
+func saveFile(name string, content []byte) error {
+	f, err := os.Create(name)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	if _, err := io.Copy(f, bytes.NewReader(content)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createDirIfNotExists(p string) error {
+	if _, err := os.Stat(p); err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+		if err := os.MkdirAll(p, 0755); err != nil {
+			return err
+		}
+	}
+	return nil
 }

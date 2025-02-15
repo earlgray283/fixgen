@@ -18,7 +18,7 @@ func Test_GoldenTest_ent(t *testing.T) {
 	g, err := gen_ent.NewGenerator(".")
 	require.NoError(t, err)
 
-	files, err := gen.GenerateWithFormat(g, "fixture")
+	files, err := gen.GenerateWithFormat(g)
 	require.NoError(t, err)
 
 	goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir("testdata"))
