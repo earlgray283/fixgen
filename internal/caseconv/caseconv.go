@@ -1,32 +1,20 @@
 package caseconv
 
 import (
+	"strings"
 	"unicode"
 )
 
-const (
-	SepSnake = '_'
-)
-
-type (
-	ConvertFunc            func(r rune) rune
-	IsSeparatePositionFunc func(prev, current rune) bool
-)
-
 func ConvertPascalToSnake(s string) string {
-	return ConvertToExpandCase(s, SepSnake, unicode.ToLower, func(prev, current rune) bool {
-		return !unicode.IsUpper(prev) && unicode.IsUpper(current)
-	})
-}
+	t := &strings.Builder{}
+	t.Grow(len(s))
 
-func ConvertToExpandCase(s string, sep rune, convert ConvertFunc, isSeparatePosition IsSeparatePositionFunc) string {
-	runeSlice := []rune(s)
-	t := make([]rune, 0)
-	for i, c := range runeSlice {
-		if i > 0 && isSeparatePosition(runeSlice[i-1], c) {
-			t = append(t, sep)
+	for i, c := range s {
+		if i > 0 && unicode.IsLower(rune(s[i-1])) && unicode.IsUpper(rune(c)) {
+			t.WriteByte('_')
 		}
-		t = append(t, convert(c))
+		t.WriteRune(unicode.ToLower(c))
 	}
-	return string(t)
+
+	return t.String()
 }

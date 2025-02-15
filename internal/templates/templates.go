@@ -1,4 +1,4 @@
-package internal
+package templates
 
 import (
 	"embed"
@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	//go:embed templates
+	//go:embed *
 	embedFs         embed.FS
 	TmplMockEntFile *template.Template
 	TmplMockYoFile  *template.Template
@@ -14,9 +14,9 @@ var (
 )
 
 func init() {
-	TmplMockEntFile = parseFS("templates/ent.go.tmpl")
-	TmplMockYoFile = parseFS("templates/yo.go.tmpl")
-	TmplCommonFile = parseFS("templates/common.go.tmpl")
+	TmplMockEntFile = parseFS("ent.go.tmpl")
+	TmplMockYoFile = parseFS("yo.go.tmpl")
+	TmplCommonFile = parseFS("common.go.tmpl")
 }
 
 func parseFS(pattern string) *template.Template {

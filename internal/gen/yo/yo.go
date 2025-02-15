@@ -9,10 +9,10 @@ import (
 	yo_loaders "go.mercari.io/yo/loaders"
 	"go.mercari.io/yo/models"
 
-	"github.com/earlgray283/fixgen/internal"
 	"github.com/earlgray283/fixgen/internal/caseconv"
 	"github.com/earlgray283/fixgen/internal/gen"
 	"github.com/earlgray283/fixgen/internal/loaders"
+	"github.com/earlgray283/fixgen/internal/templates"
 )
 
 type Generator struct {
@@ -143,7 +143,7 @@ func loadYoTables(ddlPath string) (Tables, error) {
 
 func (g *Generator) generateCommonFile() (*gen.File, error) {
 	buf := &bytes.Buffer{}
-	if err := internal.TmplCommonFile.Execute(buf, map[string]string{
+	if err := templates.TmplCommonFile.Execute(buf, map[string]string{
 		"PackageName": g.opt.PackageName,
 	}); err != nil {
 		return nil, err
@@ -189,7 +189,7 @@ func (g *Generator) generate(si *StructInfo) (*gen.File, error) {
 	}
 
 	buf := &bytes.Buffer{}
-	if err := internal.TmplMockYoFile.Execute(buf, map[string]any{
+	if err := templates.TmplMockYoFile.Execute(buf, map[string]any{
 		"PackageName": g.opt.PackageName,
 		"GenPkgPath":  g.yoPackagePath,
 		"TableName":   si.Name,
