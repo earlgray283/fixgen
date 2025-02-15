@@ -13,7 +13,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *spanner.Client, ovrTbl *yo_gen.User) *yo_gen.User {
+func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User) *yo_gen.User {
 	t.Helper()
 
 	tbl := &yo_gen.User{
@@ -22,17 +22,17 @@ func CreateUser(t *testing.T, db *spanner.Client, ovrTbl *yo_gen.User) *yo_gen.U
 		CreatedAt: spanner.CommitTimestamp,
 	}
 
-	if isOverWritten(ovrTbl.ID) {
-		tbl.ID = ovrTbl.ID
+	if isModified(m.ID) {
+		tbl.ID = m.ID
 	}
-	if isOverWritten(ovrTbl.Name) {
-		tbl.Name = ovrTbl.Name
+	if isModified(m.Name) {
+		tbl.Name = m.Name
 	}
-	if isOverWritten(ovrTbl.CreatedAt) {
+	if isModified(m.CreatedAt) {
 		t.Fatal("spanner.CommitTimestamp should be used")
 	}
-	if !ovrTbl.UpdatedAt.IsNull() {
-		tbl.UpdatedAt = ovrTbl.UpdatedAt
+	if !m.UpdatedAt.IsNull() {
+		tbl.UpdatedAt = m.UpdatedAt
 	}
 
 	_, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {

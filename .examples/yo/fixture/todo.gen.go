@@ -13,7 +13,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateTodo(t *testing.T, db *spanner.Client, ovrTbl *yo_gen.Todo) *yo_gen.Todo {
+func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo) *yo_gen.Todo {
 	t.Helper()
 
 	tbl := &yo_gen.Todo{
@@ -23,23 +23,23 @@ func CreateTodo(t *testing.T, db *spanner.Client, ovrTbl *yo_gen.Todo) *yo_gen.T
 		CreatedAt:   spanner.CommitTimestamp,
 	}
 
-	if isOverWritten(ovrTbl.ID) {
-		tbl.ID = ovrTbl.ID
+	if isModified(m.ID) {
+		tbl.ID = m.ID
 	}
-	if isOverWritten(ovrTbl.Title) {
-		tbl.Title = ovrTbl.Title
+	if isModified(m.Title) {
+		tbl.Title = m.Title
 	}
-	if isOverWritten(ovrTbl.Description) {
-		tbl.Description = ovrTbl.Description
+	if isModified(m.Description) {
+		tbl.Description = m.Description
 	}
-	if isOverWritten(ovrTbl.CreatedAt) {
+	if isModified(m.CreatedAt) {
 		t.Fatal("spanner.CommitTimestamp should be used")
 	}
-	if !ovrTbl.UpdatedAt.IsNull() {
-		tbl.UpdatedAt = ovrTbl.UpdatedAt
+	if !m.UpdatedAt.IsNull() {
+		tbl.UpdatedAt = m.UpdatedAt
 	}
-	if !ovrTbl.DoneAt.IsNull() {
-		tbl.DoneAt = ovrTbl.DoneAt
+	if !m.DoneAt.IsNull() {
+		tbl.DoneAt = m.DoneAt
 	}
 
 	_, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {

@@ -12,13 +12,32 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateTodo(t *testing.T, db *ent_gen.Client, ovrTbl ent_gen.Todo) *ent_gen.Todo {
+func CreateTodo(t *testing.T, db *ent_gen.Client, m ent_gen.Todo) *ent_gen.Todo {
 	t.Helper()
 
 	tbl := &ent_gen.Todo{
 		ID:          rand.Int64(),
 		Title:       lo.RandomString(32, lo.AlphanumericCharset),
 		Description: lo.RandomString(32, lo.AlphanumericCharset),
+	}
+
+	if isModified(m.ID) {
+		tbl.ID = m.ID
+	}
+	if isModified(m.Title) {
+		tbl.Title = m.Title
+	}
+	if isModified(m.Description) {
+		tbl.Description = m.Description
+	}
+	if isModified(m.CreatedAt) {
+		tbl.CreatedAt = m.CreatedAt
+	}
+	if m.UpdatedAt != nil {
+		tbl.UpdatedAt = m.UpdatedAt
+	}
+	if m.DoneAt != nil {
+		tbl.DoneAt = m.DoneAt
 	}
 
 	createdTbl, err := db.Todo.Create().
