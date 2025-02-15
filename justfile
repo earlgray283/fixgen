@@ -13,6 +13,13 @@ test-golden:
 update-golden-test:
     @go test ./test/... -run="^Test_GoldenTest" -update
 
+install:
+    @go install .
+
+update-example: install
+    @cd .examples/yo && rm -rf fixture/* && fixgen yo
+    @cd .examples/ent && rm -rf fixture/* && fixgen ent
+
 build-spanner-image:
     @docker build -t fixgen-spanner:latest -f ./dockerfiles/Dockerfile_spanner . 
 

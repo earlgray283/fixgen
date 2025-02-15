@@ -17,6 +17,7 @@ import (
 
 type Flags struct {
 	Prefix                string
+	Ext                   string
 	PackageName           string
 	DestDir               string
 	CleanIfFailed         bool
@@ -27,6 +28,7 @@ func parseFlags() *Flags {
 	f := &Flags{}
 
 	flag.StringVar(&f.Prefix, "prefix", "", "")
+	flag.StringVar(&f.Ext, "ext", ".gen.go", "")
 	flag.StringVar(&f.PackageName, "pkgname", "fixture", "")
 	flag.StringVar(&f.DestDir, "dest-dir", ".", "the path the destination directory is created")
 	flag.BoolVar(&f.CleanIfFailed, "clean-if-failed", false, "clean the directory and files if failed")
@@ -70,7 +72,7 @@ func main() {
 		os.Exit(1)
 	}
 	for _, f := range files {
-		fileName := buildFileName(flgs.DestDir, flgs.PackageName, flgs.Prefix, f.Name)
+		fileName := buildFileName(flgs.DestDir, flgs.PackageName, flgs.Prefix, f.Name, flgs.Ext)
 		if err := saveFile(fileName, f.Content); err != nil {
 			if flgs.CleanIfFailed {
 				_ = os.RemoveAll(packageDirPath)
@@ -103,8 +105,8 @@ func yesNo(prompt string) bool {
 	return strings.ToLower(yn) == "y"
 }
 
-func buildFileName(destDir, packageName, goFilePrefix, name string) string {
-	return filepath.Join(destDir, packageName, fmt.Sprintf("%s%s.go", goFilePrefix, name))
+func buildFileName(destDir, packageName, prefix, name, ext string) string {
+	return filepath.Join(destDir, packageName, fmt.Sprintf("%s%s%s", prefix, name, ext))
 }
 
 func saveFile(name string, content []byte) error {

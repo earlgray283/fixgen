@@ -21,6 +21,7 @@ fixgen yo
 | Option Name   | Flag               | Default Value | Description                                                                                                       |
 | ------------- | ------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Prefix        | `-prefix`          | ``            | prefix for names of generated Go files                                                                            |
+| Extension     | `-ext`             | `.gen.go`     | extension for names of generated Go files                                                                         |
 | PackageName   | `-pkgname`         | `fixture`     | package name for generated Go files                                                                               |
 | DestDir       | `-dest-dir`        | `.`           | destination directory(if DestDir is `foo` and PackageName is `var`, then the directory `foo/var` will be created) |
 | CleanIfFailed | `-clean-if-failed` | `false`       | clean generated files and directories if the generation failed                                                    |
