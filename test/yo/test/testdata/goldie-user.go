@@ -13,7 +13,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User) *yo_gen.User {
+func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
 	t.Helper()
 
 	tbl := &yo_gen.User{
@@ -33,6 +33,9 @@ func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User) *yo_gen.User {
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt
+	}
+	for _, opt := range opts {
+		opt(tbl)
 	}
 
 	_, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {

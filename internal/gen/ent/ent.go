@@ -144,8 +144,9 @@ func (g *Generator) generate(si *load.StructInfo) (*gen.File, error) {
 			Ignore:             column.Immutable || column.Nillable || column.Default || f.DefaultValue == "",
 		})
 	}
+	fields[len(fields)-1].IsLast = true
 
-	content, err := gen.ExecuteTemplate(templates.TmplMockEntFile, map[string]any{
+	content, err := templates.Execute(templates.TmplEntFile, map[string]any{
 		"TableName": si.Name,
 		"Fields":    fields,
 	})
@@ -176,4 +177,5 @@ type Field struct {
 	Nillable           bool
 	HasDefaultOnCreate bool
 	Ignore             bool
+	IsLast             bool
 }

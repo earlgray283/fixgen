@@ -173,7 +173,7 @@ func (g *Generator) generate(si *StructInfo) (*gen.File, error) {
 		})
 	}
 
-	content, err := gen.ExecuteTemplate(templates.TmplMockYoFile, map[string]any{
+	content, err := templates.Execute(templates.TmplYoFile, map[string]any{
 		"TableName": si.Name,
 		"Fields":    fields,
 	})

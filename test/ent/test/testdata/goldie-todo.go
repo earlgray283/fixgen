@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateTodo(t *testing.T, db *ent_gen.Client, m ent_gen.Todo) *ent_gen.Todo {
+func CreateTodo(t *testing.T, db *ent_gen.Client, m ent_gen.Todo, opts ...func(*ent_gen.TodoCreate)) *ent_gen.Todo {
 	t.Helper()
 
 	tbl := &ent_gen.Todo{
@@ -40,13 +40,17 @@ func CreateTodo(t *testing.T, db *ent_gen.Client, m ent_gen.Todo) *ent_gen.Todo 
 		tbl.DoneAt = m.DoneAt
 	}
 
-	createdTbl, err := db.Todo.Create().
+	builder := db.Todo.Create().
 		SetID(tbl.ID).
 		SetTitle(tbl.Title).
 		SetDescription(tbl.Description).
 		SetUpdatedAt(*tbl.UpdatedAt).
-		SetDoneAt(*tbl.DoneAt).
-		Save(context.Background())
+		SetDoneAt(*tbl.DoneAt)
+	for _, opt := range opts {
+		opt(builder)
+	}
+
+	createdTbl, err := builder.Save(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}

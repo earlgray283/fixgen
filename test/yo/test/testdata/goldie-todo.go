@@ -13,7 +13,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo) *yo_gen.Todo {
+func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*yo_gen.Todo)) *yo_gen.Todo {
 	t.Helper()
 
 	tbl := &yo_gen.Todo{
@@ -40,6 +40,9 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo) *yo_gen.Todo {
 	}
 	if !m.DoneAt.IsNull() {
 		tbl.DoneAt = m.DoneAt
+	}
+	for _, opt := range opts {
+		opt(tbl)
 	}
 
 	_, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {

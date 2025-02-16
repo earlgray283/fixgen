@@ -1,4 +1,4 @@
-func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m ent_gen.{{.TableName}}) *ent_gen.{{.TableName}} {
+func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m ent_gen.{{.TableName}}, opts ...func(*ent_gen.{{.TableName}}Create)) *ent_gen.{{.TableName}} {
   t.Helper()
 
   tbl := &ent_gen.{{.TableName}} { 
@@ -17,13 +17,17 @@ func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m ent_gen.{{.TableNa
     }
   {{ end }}
 
-  createdTbl, err := db.{{.TableName}}.Create().
+  builder := db.{{.TableName}}.Create().
   {{ range $i, $f := .Fields -}}
     {{ if not $f.HasDefaultOnCreate }}
-      Set{{ $f.Name }}({{- if $f.Nillable }}*{{ end -}}tbl.{{ $f.Name }}).
+      Set{{ $f.Name }}({{- if $f.Nillable }}*{{ end -}}tbl.{{ $f.Name }}){{ if not $f.IsLast }}.{{ end }}
     {{- end }}
   {{- end }}
-      Save(context.Background())
+  for _, opt := range opts {
+    opt(builder)
+  }
+
+  createdTbl, err := builder.Save(context.Background())
   if err != nil {
     t.Fatal(err)
   }

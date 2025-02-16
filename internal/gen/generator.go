@@ -40,7 +40,7 @@ func GenerateWithFormat[G Generator](g G, opts ...OptionFunc) ([]*File, error) {
 	files = append(files, commonFile)
 
 	genPkgInfo := g.GenPackageInfo()
-	header, err := ExecuteTemplate(templates.TmplHeaderFile, map[string]string{
+	header, err := templates.Execute(templates.TmplHeaderFile, map[string]string{
 		"PackageName": opt.packageName,
 		"GenPkgAlias": genPkgInfo.PackageAlias,
 		"GenPkgPath":  genPkgInfo.PackagePath,
@@ -62,7 +62,7 @@ func GenerateWithFormat[G Generator](g G, opts ...OptionFunc) ([]*File, error) {
 }
 
 func generateCommonFile() (*File, error) {
-	content, err := ExecuteTemplate(templates.TmplCommonFile, nil)
+	content, err := templates.Execute(templates.TmplCommonFile, nil)
 	if err != nil {
 		return nil, err
 	}

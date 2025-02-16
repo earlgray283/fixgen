@@ -1,12 +1,10 @@
 package gen
 
 import (
-	"bytes"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"text/template"
 
 	"golang.org/x/mod/modfile"
 )
@@ -80,12 +78,4 @@ func LoadGoModulePath(dirPath string) (string, error) {
 		return "", err
 	}
 	return f.Module.Mod.Path, nil
-}
-
-func ExecuteTemplate(tmpl *template.Template, data any) ([]byte, error) {
-	buf := &bytes.Buffer{}
-	if err := tmpl.Execute(buf, data); err != nil {
-		return nil, fmt.Errorf("failed to execute template `%s`: %+w", tmpl.Name(), err)
-	}
-	return buf.Bytes(), nil
 }
