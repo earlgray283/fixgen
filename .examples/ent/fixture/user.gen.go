@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *ent_gen.Client, m ent_gen.User) *ent_gen.User {
+func CreateUser(t *testing.T, db *ent_gen.Client, m ent_gen.User, opts ...func(*ent_gen.UserCreate)) *ent_gen.User {
 	t.Helper()
 
 	tbl := &ent_gen.User{
@@ -33,11 +33,15 @@ func CreateUser(t *testing.T, db *ent_gen.Client, m ent_gen.User) *ent_gen.User 
 		tbl.UpdatedAt = m.UpdatedAt
 	}
 
-	createdTbl, err := db.User.Create().
+	builder := db.User.Create().
 		SetID(tbl.ID).
 		SetName(tbl.Name).
-		SetUpdatedAt(*tbl.UpdatedAt).
-		Save(context.Background())
+		SetUpdatedAt(*tbl.UpdatedAt)
+	for _, opt := range opts {
+		opt(builder)
+	}
+
+	createdTbl, err := builder.Save(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
