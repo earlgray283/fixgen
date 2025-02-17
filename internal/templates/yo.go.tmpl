@@ -1,12 +1,23 @@
 func Create{{.TableName}}(t *testing.T, db *spanner.Client, m *yo_gen.{{.TableName}}, opts ...func(*yo_gen.{{ .TableName }})) *yo_gen.{{.TableName}} {
   t.Helper()
 
-  tbl := &yo_gen.{{.TableName}} { {{ range $i, $f := .Fields }}
-      {{ if not $f.IsSpannerNullType }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ end }} {{ end }}
+  tbl := &yo_gen.{{.TableName}} {
+  {{ range $i, $f := .Fields -}}
+    {{ if or (not $f.IsSpannerNullType) ($f.DefaultValue) -}} {{ $f.Name }}: {{ $f.DefaultValue }},
+    {{ end }}
+  {{- end -}}
   }
 
-  {{ range $i, $f := .Fields }} if {{ if $f.IsSpannerNullType }} !m.{{ $f.Name }}.IsNull() {{ else }} isModified(m.{{ $f.Name }}) {{ end }} {
-      {{ if $f.AllowCommitTimestamp }} t.Fatal("spanner.CommitTimestamp should be used") {{ else }} tbl.{{ $f.Name }} = m.{{ $f.Name }} {{end}}
+  {{ range $i, $f := .Fields -}}
+  if
+    {{- if $f.IsSpannerNullType -}} !m.{{ $f.Name }}.IsNull()
+    {{- else if $f.Type.IsSlice -}} len(m.{{ $f.Name }}) > 0
+    {{- else }} isModified(m.{{ $f.Name }})
+    {{- end -}} {
+
+    {{- if $f.AllowCommitTimestamp -}} t.Fatal("spanner.CommitTimestamp should be used")
+    {{- else -}} tbl.{{ $f.Name }} = m.{{ $f.Name }}
+    {{- end -}}
   }
   {{ end -}}
   for _, opt := range opts {
