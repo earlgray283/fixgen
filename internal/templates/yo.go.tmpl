@@ -3,7 +3,9 @@ func Create{{.TableName}}(t *testing.T, db *spanner.Client, m *yo_gen.{{.TableNa
 
   tbl := &yo_gen.{{.TableName}} {
   {{ range $i, $f := .Fields -}}
-    {{ if or (not $f.IsSpannerNullType) ($f.DefaultValue) -}} {{ $f.Name }}: {{ $f.DefaultValue }},
+    {{ if $f.IsSpannerNullType }} // {{ $f.Name }} is Nullable
+    {{ else if not $f.DefaultValue -}} // {{ $f.Name }} does not have a default value,
+    {{ else }} {{ $f.Name }}: {{ $f.DefaultValue }},
     {{ end }}
   {{- end -}}
   }
@@ -14,10 +16,9 @@ func Create{{.TableName}}(t *testing.T, db *spanner.Client, m *yo_gen.{{.TableNa
     {{- else if $f.Type.IsSlice -}} len(m.{{ $f.Name }}) > 0
     {{- else }} isModified(m.{{ $f.Name }})
     {{- end -}} {
-
-    {{- if $f.AllowCommitTimestamp -}} t.Fatal("spanner.CommitTimestamp should be used")
+    {{ if $f.AllowCommitTimestamp -}} t.Fatal("spanner.CommitTimestamp should be used")
     {{- else -}} tbl.{{ $f.Name }} = m.{{ $f.Name }}
-    {{- end -}}
+    {{- end }}
   }
   {{ end -}}
   for _, opt := range opts {

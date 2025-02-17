@@ -21,6 +21,8 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 		Title:       lo.RandomString(32, lo.AlphanumericCharset),
 		Description: lo.RandomString(32, lo.AlphanumericCharset),
 		CreatedAt:   spanner.CommitTimestamp,
+		// UpdatedAt is Nullable
+		// DoneAt is Nullable
 	}
 
 	if isModified(m.ID) {
