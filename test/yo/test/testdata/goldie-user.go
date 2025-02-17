@@ -20,7 +20,7 @@ func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*
 		ID:        rand.Int64(),
 		Name:      lo.RandomString(32, lo.AlphanumericCharset),
 		CreatedAt: spanner.CommitTimestamp,
-		// UpdatedAt is Nullable
+		// UpdatedAt is nullable
 	}
 
 	if isModified(m.ID) {

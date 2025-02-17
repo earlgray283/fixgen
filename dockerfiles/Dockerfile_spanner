@@ -6,6 +6,6 @@ RUN \
   && gcloud config set project test-project \
   && gcloud config set api_endpoint_overrides/spanner http://0.0.0.0:9020/
 
-COPY ./test/yo/project/schema.sql schema.sql
+COPY ./test/yo/test/schema.sql schema.sql
 
 ENTRYPOINT [ "sh", "-c", "/google-cloud-sdk/bin/cloud_spanner_emulator/gateway_main --hostname 0.0.0.0 --grpc_port 9010 --http_port 9020"]

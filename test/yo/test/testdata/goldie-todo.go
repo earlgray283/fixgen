@@ -20,9 +20,10 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 		ID:          rand.Int64(),
 		Title:       lo.RandomString(32, lo.AlphanumericCharset),
 		Description: lo.RandomString(32, lo.AlphanumericCharset),
-		CreatedAt:   spanner.CommitTimestamp,
-		// UpdatedAt is Nullable
-		// DoneAt is Nullable
+		// Tags is slice
+		CreatedAt: spanner.CommitTimestamp,
+		// UpdatedAt is nullable
+		// DoneAt is nullable
 	}
 
 	if isModified(m.ID) {
@@ -33,6 +34,9 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 	}
 	if isModified(m.Description) {
 		tbl.Description = m.Description
+	}
+	if len(m.Tags) > 0 {
+		tbl.Tags = m.Tags
 	}
 	if isModified(m.CreatedAt) {
 		t.Fatal("spanner.CommitTimestamp should be used")
