@@ -14,13 +14,22 @@ import (
 func Test_GoldenTest_yo(t *testing.T) {
 	require.NoError(t, os.Chdir("./test"))
 
-	g, err := gen_yo.NewGenerator(".")
+	g, err := gen_yo.NewGenerator(".", false)
 	require.NoError(t, err)
-
 	files, err := gen.GenerateWithFormat(g)
 	require.NoError(t, err)
 
 	goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir("testdata"))
+	for _, f := range files {
+		goldie.Assert(t, "goldie-"+f.Name, f.Content)
+	}
+
+	g, err = gen_yo.NewGenerator(".", true)
+	require.NoError(t, err)
+	files, err = gen.GenerateWithFormat(g)
+	require.NoError(t, err)
+
+	goldie = goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir("testdata-context"))
 	for _, f := range files {
 		goldie.Assert(t, "goldie-"+f.Name, f.Content)
 	}

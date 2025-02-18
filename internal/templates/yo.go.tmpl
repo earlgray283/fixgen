@@ -1,4 +1,4 @@
-func Create{{.TableName}}(t *testing.T, db *spanner.Client, m *yo_gen.{{.TableName}}, opts ...func(*yo_gen.{{ .TableName }})) *yo_gen.{{.TableName}} {
+func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *testing.T, db *spanner.Client, m *yo_gen.{{.TableName}}, opts ...func(*yo_gen.{{ .TableName }})) *yo_gen.{{.TableName}} {
   t.Helper()
 
   tbl := &yo_gen.{{.TableName}} {
@@ -26,7 +26,7 @@ func Create{{.TableName}}(t *testing.T, db *spanner.Client, m *yo_gen.{{.TableNa
     opt(tbl)
   }
 
-  _, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+  _, err := db.ReadWriteTransaction({{ if .UseContext }}ctx{{ else }}context.Background(){{end}}, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
     return tx.BufferWrite([]*spanner.Mutation{tbl.Insert(ctx)})
   })
   if err != nil {

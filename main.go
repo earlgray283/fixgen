@@ -22,6 +22,7 @@ type Flags struct {
 	DestDir               string
 	CleanIfFailed         bool
 	ConfirmIfExperimental bool
+	UseContext            bool
 }
 
 func parseFlags() *Flags {
@@ -33,6 +34,7 @@ func parseFlags() *Flags {
 	flag.StringVar(&f.DestDir, "dest-dir", ".", "the path the destination directory is created")
 	flag.BoolVar(&f.CleanIfFailed, "clean-if-failed", false, "clean the directory and files if failed")
 	flag.BoolVar(&f.ConfirmIfExperimental, "confirm-if-experimental", true, "confirm before generation if the generator is experimental")
+	flag.BoolVar(&f.UseContext, "use-context", false, "provide `context.Context` argument")
 
 	flag.Parse()
 
@@ -48,7 +50,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	generator, err := loadGenerator(generatorType, ".")
+	generator, err := loadGenerator(generatorType, ".", flgs.UseContext)
 	if err != nil {
 		eprintf("failed to loadGenerator: %v\n", err)
 		os.Exit(1)
@@ -83,12 +85,12 @@ func main() {
 	}
 }
 
-func loadGenerator(typ, workDir string) (gen.Generator, error) {
+func loadGenerator(typ, workDir string, useContext bool) (gen.Generator, error) {
 	switch typ {
 	case "ent":
 		return gen_ent.NewGenerator(workDir)
 	case "yo":
-		return gen_yo.NewGenerator(workDir)
+		return gen_yo.NewGenerator(workDir, useContext)
 	default:
 		return nil, fmt.Errorf("unrecognized generator type: %s", typ)
 	}
