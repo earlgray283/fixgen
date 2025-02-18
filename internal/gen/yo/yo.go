@@ -15,40 +15,21 @@ import (
 )
 
 type Generator struct {
-	genDirPath    string
 	yoPackagePath string
-	structInfos   []*StructInfo
+	filepaths     []string
 	tables        Tables
 }
 
-// NewGenerator is a constructor for the struct Generator
+// NewGenerator loads information and returns pointer of Generator
 func NewGenerator(workDir string) (*Generator, error) {
 	goModulePath, err := gen.LoadGoModulePath(workDir)
 	if err != nil {
 		return nil, fmt.Errorf(": %+w\n", err)
 	}
 
-	genDirPath, filepathList, err := gen.FindAndReadDirByFileName(workDir, "yo_db.yo.go")
+	genDirPath, filepaths, err := gen.FindAndReadDirByFileName(workDir, "yo_db.yo.go")
 	if err != nil {
 		return nil, fmt.Errorf("failed to util.FindAndReadDirByFileName: %+w", err)
-	}
-
-	targetStructInfos := make([]*StructInfo, 0)
-	for _, p := range filepathList {
-		structInfos, err := load.LoadStructInfos(p)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load structInfos from %s: %+w", p, err)
-		}
-		for _, si := range structInfos {
-			sqlTableName := extractSQLTableNameFromComments(si.Comments)
-			if sqlTableName == "" {
-				continue
-			}
-			targetStructInfos = append(targetStructInfos, &StructInfo{
-				StructInfo:   si,
-				SQLTableName: sqlTableName,
-			})
-		}
 	}
 
 	ddlPath, err := gen.FindFile(workDir, "schema.sql")
@@ -61,38 +42,10 @@ func NewGenerator(workDir string) (*Generator, error) {
 	}
 
 	return &Generator{
-		genDirPath:    genDirPath,
 		yoPackagePath: strings.Join([]string{goModulePath, genDirPath}, "/"),
-		structInfos:   targetStructInfos,
+		filepaths:     filepaths,
 		tables:        tables,
 	}, nil
-}
-
-var regexpYoStructComment = regexp.MustCompile(`(.+) represents a row from '(.+)'\.`)
-
-func extractSQLTableNameFromComments(comments []string) string {
-	for _, comment := range comments {
-		matches := regexpYoStructComment.FindStringSubmatch(comment)
-		if len(matches) < 3 || matches[2] == "" {
-			continue
-		}
-		return matches[2]
-	}
-	return ""
-}
-
-func (g *Generator) Generate() ([]*gen.File, error) {
-	files := make([]*gen.File, 0, len(g.structInfos)+1)
-
-	for _, si := range g.structInfos {
-		file, err := g.generate(si)
-		if err != nil {
-			return nil, err
-		}
-		files = append(files, file)
-	}
-
-	return files, nil
 }
 
 func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
@@ -136,29 +89,68 @@ func loadYoTables(ddlPath string) (Tables, error) {
 	return tables, nil
 }
 
-type StructInfo struct {
-	*load.StructInfo
-	SQLTableName string
+func (g *Generator) Generate() ([]*gen.File, error) {
+	files := make([]*gen.File, 0)
+
+	for _, f := range g.filepaths {
+		structInfos, err := load.LoadStructInfos(f)
+		if err != nil {
+			return nil, err
+		}
+
+		yoStructInfos := make([]*structInfo, 0)
+		for _, si := range structInfos {
+			yosi, err := g.parse(si)
+			if err != nil {
+				return nil, err
+			}
+			if yosi == nil {
+				continue
+			}
+			yoStructInfos = append(yoStructInfos, yosi)
+		}
+
+		for _, si := range yoStructInfos {
+			file, err := g.execute(si)
+			if err != nil {
+				return nil, err
+			}
+			files = append(files, file)
+		}
+	}
+
+	return files, nil
 }
 
-type Field struct {
+type structInfo struct {
+	tableName string
+	fields    []*field
+}
+
+type field struct {
 	*load.Field
 	IsSpannerNullType    bool // the type is `spanner.Null{type}`
 	AllowCommitTimestamp bool
 }
 
-func (g *Generator) generate(si *StructInfo) (*gen.File, error) {
-	columns, ok := g.tables[si.SQLTableName]
-	if !ok {
-		return nil, fmt.Errorf("failed to get the table information `%s`", si.SQLTableName)
+func (g *Generator) parse(si *load.StructInfo) (*structInfo, error) {
+	sqlTableName := extractSQLTableNameFromComments(si.Comments)
+	if sqlTableName == "" {
+		return nil, nil
 	}
 
-	fields := make([]*Field, 0, len(si.Fields))
+	columns, ok := g.tables[sqlTableName]
+	if !ok {
+		return nil, fmt.Errorf("failed to get the table information `%s`", sqlTableName)
+	}
+
+	fields := make([]*field, 0, len(si.Fields))
 	for _, f := range si.Fields {
 		sqlColumnName, ok := f.Tags["spanner"]
 		if !ok {
 			return nil, fmt.Errorf("failed to extract SQLColumnName from tag(%v)", f.Tags)
 		}
+
 		column, ok := columns[sqlColumnName]
 		if !ok {
 			return nil, fmt.Errorf("failed to get column: %v", sqlColumnName)
@@ -166,23 +158,44 @@ func (g *Generator) generate(si *StructInfo) (*gen.File, error) {
 		if column.AllowCommitTimestamp {
 			f.DefaultValue = "spanner.CommitTimestamp"
 		}
-		fields = append(fields, &Field{
+
+		fields = append(fields, &field{
 			Field:                f,
 			IsSpannerNullType:    strings.HasPrefix(f.Type.Name, "spanner.Null"),
 			AllowCommitTimestamp: column.AllowCommitTimestamp,
 		})
 	}
 
+	return &structInfo{
+		tableName: si.Name,
+		fields:    fields,
+	}, nil
+}
+
+var regexpYoStructComment = regexp.MustCompile(`(.+) represents a row from '(.+)'\.`)
+
+func extractSQLTableNameFromComments(comments []string) string {
+	for _, comment := range comments {
+		matches := regexpYoStructComment.FindStringSubmatch(comment)
+		if len(matches) < 3 || matches[2] == "" {
+			continue
+		}
+		return matches[2]
+	}
+	return ""
+}
+
+func (g *Generator) execute(si *structInfo) (*gen.File, error) {
 	content, err := templates.Execute(templates.TmplYoFile, map[string]any{
-		"TableName": si.Name,
-		"Fields":    fields,
+		"TableName": si.tableName,
+		"Fields":    si.fields,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return &gen.File{
-		Name:    caseconv.ConvertPascalToSnake(si.Name),
+		Name:    caseconv.ConvertPascalToSnake(si.tableName),
 		Content: content,
 	}, nil
 }
