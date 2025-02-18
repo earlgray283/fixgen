@@ -189,8 +189,8 @@ func extractSQLTableNameFromComments(comments []string) string {
 
 func (g *Generator) execute(si *structInfo) (*gen.File, error) {
 	content, err := templates.Execute(templates.TmplYoFile, map[string]any{
-		"TableName":  si.Name,
-		"Fields":     fields,
+		"TableName":  si.tableName,
+		"Fields":     si.fields,
 		"UseContext": g.useContext,
 	})
 	if err != nil {
