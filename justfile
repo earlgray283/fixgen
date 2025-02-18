@@ -7,11 +7,17 @@ fmt:
 test:
     @go test -v ./...
 
-test-golden:
+test-golden-all:
     @go test ./test/... -run="^Test_GoldenTest"
 
-update-golden-test:
+test-golden type:
+    @go test ./test/{{ type }} -run="^Test_GoldenTest"
+
+update-golden-all:
     @go test ./test/... -run="^Test_GoldenTest" -update
+
+update-golden type:
+    @go test ./test/{{ type }} -run="^Test_GoldenTest" -update
 
 install:
     @go install .
