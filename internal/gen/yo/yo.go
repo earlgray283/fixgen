@@ -16,6 +16,7 @@ import (
 
 type Generator struct {
 	yoPackagePath      string
+	genDirPath         string
 	filepaths          []string
 	tables             Tables
 	useContext         bool
@@ -45,6 +46,7 @@ func NewGenerator(workDir string, useContext, usePointerModifier bool) (*Generat
 
 	return &Generator{
 		yoPackagePath:      strings.Join([]string{goModulePath, genDirPath}, "/"),
+		genDirPath:         genDirPath,
 		filepaths:          filepaths,
 		tables:             tables,
 		useContext:         useContext,
@@ -54,8 +56,9 @@ func NewGenerator(workDir string, useContext, usePointerModifier bool) (*Generat
 
 func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
 	return &gen.GenPackageInfo{
-		PackagePath:  g.yoPackagePath,
-		PackageAlias: "yo_gen",
+		PackagePath:     g.yoPackagePath,
+		PackageAlias:    "yo_gen",
+		PackageLocation: g.genDirPath,
 	}
 }
 
@@ -93,34 +96,27 @@ func loadYoTables(ddlPath string) (Tables, error) {
 	return tables, nil
 }
 
-func (g *Generator) Generate() ([]*gen.File, error) {
-	files := make([]*gen.File, 0)
+func (g *Generator) Generate(structInfos []*load.StructInfo) ([]*gen.File, error) {
+	files := make([]*gen.File, 0, len(structInfos))
 
-	for _, f := range g.filepaths {
-		structInfos, err := load.LoadStructInfos(f)
+	yoStructInfos := make([]*structInfo, 0)
+	for _, si := range structInfos {
+		yosi, err := g.parse(si)
 		if err != nil {
 			return nil, err
 		}
-
-		yoStructInfos := make([]*structInfo, 0)
-		for _, si := range structInfos {
-			yosi, err := g.parse(si)
-			if err != nil {
-				return nil, err
-			}
-			if yosi == nil {
-				continue
-			}
-			yoStructInfos = append(yoStructInfos, yosi)
+		if yosi == nil {
+			continue
 		}
+		yoStructInfos = append(yoStructInfos, yosi)
+	}
 
-		for _, si := range yoStructInfos {
-			file, err := g.execute(si)
-			if err != nil {
-				return nil, err
-			}
-			files = append(files, file)
+	for _, si := range yoStructInfos {
+		file, err := g.execute(si)
+		if err != nil {
+			return nil, err
 		}
+		files = append(files, file)
 	}
 
 	return files, nil

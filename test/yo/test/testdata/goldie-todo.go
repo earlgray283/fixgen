@@ -6,7 +6,6 @@ import (
 	"context"
 	"math/rand/v2"
 	"testing"
-
 	yo_gen "yo/models"
 
 	"cloud.google.com/go/spanner"

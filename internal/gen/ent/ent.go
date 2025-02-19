@@ -18,7 +18,7 @@ import (
 
 type Generator struct {
 	entPackagePath string
-	structInfos    []*load.StructInfo
+	genDirPath     string
 	tables         Tables
 }
 
@@ -27,28 +27,12 @@ func NewGenerator(workDir string) (*Generator, error) {
 	if err != nil {
 		return nil, err
 	}
-	entries, err := os.ReadDir(genDirPath)
-	if err != nil {
-		return nil, err
-	}
-
-	targetStructInfos := make([]*load.StructInfo, 0)
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		p := filepath.Join(genDirPath, e.Name())
-		structInfos, err := load.LoadStructInfos(p)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load structInfos from %s: %+w", p, err)
-		}
-		targetStructInfos = append(targetStructInfos, structInfos...)
-	}
 
 	spec, err := (&ent_load.Config{Path: schemaDirPath}).Load()
 	if err != nil {
 		return nil, fmt.Errorf("failed to ent load: %+w", err)
 	}
+
 	tables := make(Tables, len(spec.Schemas))
 	for _, s := range spec.Schemas {
 		cols := make(Columns, len(s.Fields))
@@ -60,7 +44,7 @@ func NewGenerator(workDir string) (*Generator, error) {
 
 	return &Generator{
 		entPackagePath: strings.Join([]string{spec.Module.Path, genDirPath}, "/"),
-		structInfos:    targetStructInfos,
+		genDirPath:     genDirPath,
 		tables:         tables,
 	}, nil
 }
@@ -92,10 +76,10 @@ func findEntDirs(workDir string) (schemaDirPath, genDirPath string, err error) {
 	return schemaDirPath, genDirPath, nil
 }
 
-func (g *Generator) Generate() ([]*gen.File, error) {
+func (g *Generator) Generate(structInfos []*load.StructInfo) ([]*gen.File, error) {
 	files := make([]*gen.File, 0)
 
-	for _, si := range g.structInfos {
+	for _, si := range structInfos {
 		f, err := g.generate(si)
 		if err != nil {
 			return nil, err
@@ -111,8 +95,9 @@ func (g *Generator) Generate() ([]*gen.File, error) {
 
 func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
 	return &gen.GenPackageInfo{
-		PackagePath:  g.entPackagePath,
-		PackageAlias: "ent_gen",
+		PackagePath:     g.entPackagePath,
+		PackageAlias:    "ent_gen",
+		PackageLocation: g.genDirPath,
 	}
 }
 

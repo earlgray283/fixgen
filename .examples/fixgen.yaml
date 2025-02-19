@@ -1,0 +1,18 @@
+structs:
+  User:
+    fields:
+      Name:
+        # string だったら "value", int だったら 1 と置かれる
+        # value: "callfunc()" にすると "callfunc()" と置かれるので注意
+        value: "Taro Yamada"
+      IconURL:
+        expr: 'fmt.Sprintf("http://example.com/images/%d.png", rand.Int64())'
+  Todo:
+    fields:
+      Title:
+        # 式がそのまま置かれる
+        expr: 'fmt.Sprintf("Blog #%d", rand.Int64())'
+
+imports:
+  - package: "math/rand/v2"
+  - package: "fmt"

@@ -6,9 +6,11 @@ replace go.mercari.io/yo => ../yo
 
 require (
 	entgo.io/ent v0.14.2
+	github.com/goccy/go-yaml v1.15.23
 	github.com/sebdah/goldie/v2 v2.5.5
 	github.com/stretchr/testify v1.9.0
 	go.mercari.io/yo v0.5.7
+	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
 	golang.org/x/mod v0.23.0
 	golang.org/x/tools v0.30.0
 )

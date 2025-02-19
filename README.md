@@ -26,6 +26,10 @@ fixgen yo
 | DestDir       | `-dest-dir`        | `.`           | destination directory(if DestDir is `foo` and PackageName is `var`, then the directory `foo/var` will be created) |
 | CleanIfFailed | `-clean-if-failed` | `false`       | clean generated files and directories if the generation failed                                                    |
 
+## Config
+
+See [example](https://github.com/earlgray283/fixgen/tree/main/.examples/fixgen.yaml)
+
 ## Support Tools
 
 | Tool Name | Repository URL                                | Support | Experimental |

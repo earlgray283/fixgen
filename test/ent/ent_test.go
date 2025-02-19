@@ -7,6 +7,7 @@ import (
 	goldiev2 "github.com/sebdah/goldie/v2"
 	"github.com/stretchr/testify/require"
 
+	"github.com/earlgray283/fixgen/internal/config"
 	"github.com/earlgray283/fixgen/internal/gen"
 	gen_ent "github.com/earlgray283/fixgen/internal/gen/ent"
 )
@@ -18,7 +19,7 @@ func Test_GoldenTest_ent(t *testing.T) {
 	g, err := gen_ent.NewGenerator(".")
 	require.NoError(t, err)
 
-	files, err := gen.GenerateWithFormat(g)
+	files, err := gen.GenerateWithFormat(g, &config.Config{})
 	require.NoError(t, err)
 
 	goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir("testdata"))

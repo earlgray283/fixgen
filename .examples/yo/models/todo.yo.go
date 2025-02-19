@@ -16,6 +16,7 @@ type Todo struct {
 	ID          int64            `spanner:"id" json:"id"`                   // id
 	Title       string           `spanner:"title" json:"title"`             // title
 	Description string           `spanner:"description" json:"description"` // description
+	Tags        []string         `spanner:"tags" json:"tags"`               // tags
 	CreatedAt   time.Time        `spanner:"created_at" json:"created_at"`   // created_at
 	UpdatedAt   spanner.NullTime `spanner:"updated_at" json:"updated_at"`   // updated_at
 	DoneAt      spanner.NullTime `spanner:"done_at" json:"done_at"`         // done_at
@@ -32,6 +33,7 @@ func TodoColumns() []string {
 		"id",
 		"title",
 		"description",
+		"tags",
 		"created_at",
 		"updated_at",
 		"done_at",
@@ -43,6 +45,7 @@ func TodoWritableColumns() []string {
 		"id",
 		"title",
 		"description",
+		"tags",
 		"created_at",
 		"updated_at",
 		"done_at",
@@ -64,6 +67,8 @@ func (t *Todo) columnsToPtrs(cols []string, customPtrs map[string]interface{}) (
 			ret = append(ret, &t.Title)
 		case "description":
 			ret = append(ret, &t.Description)
+		case "tags":
+			ret = append(ret, &t.Tags)
 		case "created_at":
 			ret = append(ret, &t.CreatedAt)
 		case "updated_at":
@@ -87,6 +92,8 @@ func (t *Todo) columnsToValues(cols []string) ([]interface{}, error) {
 			ret = append(ret, t.Title)
 		case "description":
 			ret = append(ret, t.Description)
+		case "tags":
+			ret = append(ret, t.Tags)
 		case "created_at":
 			ret = append(ret, t.CreatedAt)
 		case "updated_at":

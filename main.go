@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/earlgray283/fixgen/internal/config"
 	"github.com/earlgray283/fixgen/internal/gen"
 	gen_ent "github.com/earlgray283/fixgen/internal/gen/ent"
 	gen_yo "github.com/earlgray283/fixgen/internal/gen/yo"
@@ -24,6 +25,7 @@ type Flags struct {
 	ConfirmIfExperimental bool
 	UseContext            bool
 	UsePointerModifier    bool
+	Config                string
 }
 
 func parseFlags() *Flags {
@@ -37,6 +39,7 @@ func parseFlags() *Flags {
 	flag.BoolVar(&f.ConfirmIfExperimental, "confirm-if-experimental", true, "confirm before generation if the generator is experimental")
 	flag.BoolVar(&f.UseContext, "use-context", false, "provide `context.Context` argument")
 	flag.BoolVar(&f.UsePointerModifier, "use-pointer-modifier", true, "")
+	flag.StringVar(&f.Config, "config", "fixgen.yaml", "location of a config file")
 
 	flag.Parse()
 
@@ -45,6 +48,12 @@ func parseFlags() *Flags {
 
 func main() {
 	flgs := parseFlags()
+
+	c, err := config.Load(flgs.Config)
+	if err != nil {
+		eprintf("failed to load config: %v\n", err)
+		os.Exit(1)
+	}
 
 	generatorType := flag.Arg(0)
 	if generatorType == "" {
@@ -64,7 +73,7 @@ func main() {
 		}
 	}
 
-	files, err := gen.GenerateWithFormat(generator, gen.WithPackageName(flgs.PackageName))
+	files, err := gen.GenerateWithFormat(generator, c, gen.WithPackageName(flgs.PackageName))
 	if err != nil {
 		eprintf("failed to generator.Generate: %v\n", err)
 		os.Exit(1)
