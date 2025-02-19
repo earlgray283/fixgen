@@ -14,7 +14,7 @@ import (
 func Test_GoldenTest_yo(t *testing.T) {
 	require.NoError(t, os.Chdir("./test"))
 
-	g, err := gen_yo.NewGenerator(".", false)
+	g, err := gen_yo.NewGenerator(".", false, true)
 	require.NoError(t, err)
 	files, err := gen.GenerateWithFormat(g)
 	require.NoError(t, err)
@@ -24,7 +24,7 @@ func Test_GoldenTest_yo(t *testing.T) {
 		goldie.Assert(t, "goldie-"+f.Name, f.Content)
 	}
 
-	g, err = gen_yo.NewGenerator(".", true)
+	g, err = gen_yo.NewGenerator(".", true, false)
 	require.NoError(t, err)
 	files, err = gen.GenerateWithFormat(g)
 	require.NoError(t, err)

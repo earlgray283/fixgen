@@ -15,14 +15,15 @@ import (
 )
 
 type Generator struct {
-	yoPackagePath string
-	filepaths     []string
-	tables        Tables
-	useContext    bool
+	yoPackagePath      string
+	filepaths          []string
+	tables             Tables
+	useContext         bool
+	usePointerModifier bool
 }
 
 // NewGenerator is a constructor for the struct Generator
-func NewGenerator(workDir string, useContext bool) (*Generator, error) {
+func NewGenerator(workDir string, useContext, usePointerModifier bool) (*Generator, error) {
 	goModulePath, err := gen.LoadGoModulePath(workDir)
 	if err != nil {
 		return nil, fmt.Errorf(": %+w\n", err)
@@ -43,10 +44,11 @@ func NewGenerator(workDir string, useContext bool) (*Generator, error) {
 	}
 
 	return &Generator{
-		yoPackagePath: strings.Join([]string{goModulePath, genDirPath}, "/"),
-		filepaths:     filepaths,
-		tables:        tables,
-		useContext:    useContext,
+		yoPackagePath:      strings.Join([]string{goModulePath, genDirPath}, "/"),
+		filepaths:          filepaths,
+		tables:             tables,
+		useContext:         useContext,
+		usePointerModifier: usePointerModifier,
 	}, nil
 }
 
@@ -189,9 +191,10 @@ func extractSQLTableNameFromComments(comments []string) string {
 
 func (g *Generator) execute(si *structInfo) (*gen.File, error) {
 	content, err := templates.Execute(templates.TmplYoFile, map[string]any{
-		"TableName":  si.tableName,
-		"Fields":     si.fields,
-		"UseContext": g.useContext,
+		"TableName":          si.tableName,
+		"Fields":             si.fields,
+		"UseContext":         g.useContext,
+		"UsePointerModifier": g.usePointerModifier,
 	})
 	if err != nil {
 		return nil, err

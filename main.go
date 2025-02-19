@@ -23,6 +23,7 @@ type Flags struct {
 	CleanIfFailed         bool
 	ConfirmIfExperimental bool
 	UseContext            bool
+	UsePointerModifier    bool
 }
 
 func parseFlags() *Flags {
@@ -35,6 +36,7 @@ func parseFlags() *Flags {
 	flag.BoolVar(&f.CleanIfFailed, "clean-if-failed", false, "clean the directory and files if failed")
 	flag.BoolVar(&f.ConfirmIfExperimental, "confirm-if-experimental", true, "confirm before generation if the generator is experimental")
 	flag.BoolVar(&f.UseContext, "use-context", false, "provide `context.Context` argument")
+	flag.BoolVar(&f.UsePointerModifier, "use-pointer-modifier", true, "")
 
 	flag.Parse()
 
@@ -50,7 +52,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	generator, err := loadGenerator(generatorType, ".", flgs.UseContext)
+	generator, err := loadGenerator(generatorType, ".", flgs.UseContext, flgs.UsePointerModifier)
 	if err != nil {
 		eprintf("failed to loadGenerator: %v\n", err)
 		os.Exit(1)
@@ -85,12 +87,12 @@ func main() {
 	}
 }
 
-func loadGenerator(typ, workDir string, useContext bool) (gen.Generator, error) {
+func loadGenerator(typ, workDir string, useContext, usePointerModifier bool) (gen.Generator, error) {
 	switch typ {
 	case "ent":
 		return gen_ent.NewGenerator(workDir)
 	case "yo":
-		return gen_yo.NewGenerator(workDir, useContext)
+		return gen_yo.NewGenerator(workDir, useContext, usePointerModifier)
 	default:
 		return nil, fmt.Errorf("unrecognized generator type: %s", typ)
 	}
