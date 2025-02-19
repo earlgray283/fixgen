@@ -1,17 +1,65 @@
 package config
 
-import "text/template"
+import (
+	"errors"
+	"fmt"
+	"os"
+
+	"github.com/goccy/go-yaml"
+)
 
 type Config struct {
-	*CommonConfig
+	Structs Structs   `yaml:"structs"`
+	Imports []*Import `yaml:"imports"`
 }
 
-type CommonConfig struct {
-	Fields          map[string]*FieldConfig       // fieldName=>FieldConfig
-	CustomTemplates map[string]*template.Template // fileName=>Template
-	Imports         []string
+type Structs map[string]*Struct
+
+type Struct struct {
+	Fields map[string]*Field `yaml:"fields"`
 }
 
-type FieldConfig struct {
-	Value string `yaml:"value"`
+type Field struct {
+	Value any    `yaml:"value"`
+	Expr  string `yaml:"expr"`
+}
+
+type Import struct {
+	Alias   string `yaml:"alias"`
+	Package string `yaml:"package"`
+}
+
+func Load(name string) (*Config, error) {
+	b, err := os.ReadFile(name)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return newConfig(), nil
+		}
+		return nil, err
+	}
+
+	var config Config
+	if err := yaml.Unmarshal(b, &config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+func newConfig() *Config {
+	return &Config{
+		Structs: make(map[string]*Struct),
+	}
+}
+
+func (f *Field) DefaultValue() string {
+	if f.Expr != "" {
+		return f.Expr
+	}
+	switch v := f.Value.(type) {
+	case string:
+		return fmt.Sprintf("\"%s\"", v)
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }

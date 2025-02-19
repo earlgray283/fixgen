@@ -15,6 +15,7 @@ import (
 type User struct {
 	ID        int64            `spanner:"id" json:"id"`                 // id
 	Name      string           `spanner:"name" json:"name"`             // name
+	IconURL   string           `spanner:"icon_url" json:"icon_url"`     // icon_url
 	CreatedAt time.Time        `spanner:"created_at" json:"created_at"` // created_at
 	UpdatedAt spanner.NullTime `spanner:"updated_at" json:"updated_at"` // updated_at
 }
@@ -29,6 +30,7 @@ func UserColumns() []string {
 	return []string{
 		"id",
 		"name",
+		"icon_url",
 		"created_at",
 		"updated_at",
 	}
@@ -38,6 +40,7 @@ func UserWritableColumns() []string {
 	return []string{
 		"id",
 		"name",
+		"icon_url",
 		"created_at",
 		"updated_at",
 	}
@@ -56,6 +59,8 @@ func (u *User) columnsToPtrs(cols []string, customPtrs map[string]interface{}) (
 			ret = append(ret, &u.ID)
 		case "name":
 			ret = append(ret, &u.Name)
+		case "icon_url":
+			ret = append(ret, &u.IconURL)
 		case "created_at":
 			ret = append(ret, &u.CreatedAt)
 		case "updated_at":
@@ -75,6 +80,8 @@ func (u *User) columnsToValues(cols []string) ([]interface{}, error) {
 			ret = append(ret, u.ID)
 		case "name":
 			ret = append(ret, u.Name)
+		case "icon_url":
+			ret = append(ret, u.IconURL)
 		case "created_at":
 			ret = append(ret, u.CreatedAt)
 		case "updated_at":

@@ -2,14 +2,18 @@ package gen
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"golang.org/x/tools/imports"
 
+	"github.com/earlgray283/fixgen/internal/config"
+	"github.com/earlgray283/fixgen/internal/load"
 	"github.com/earlgray283/fixgen/internal/templates"
 )
 
 type Generator interface {
-	Generate() ([]*File, error)
+	Generate(si []*load.StructInfo) ([]*File, error)
 	GenPackageInfo() *GenPackageInfo
 	IsExperimental() bool
 }
@@ -20,15 +24,35 @@ type File struct {
 }
 
 type GenPackageInfo struct {
-	PackagePath  string // e.g. github.com/earlgray283/pj-todo/models
-	PackageAlias string // e.g. yo_gen
+	PackagePath     string // e.g. github.com/earlgray283/pj-todo/models
+	PackageAlias    string // e.g. yo_gen
+	PackageLocation string
 }
 
-func GenerateWithFormat[G Generator](g G, opts ...OptionFunc) ([]*File, error) {
+func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) ([]*File, error) {
 	opt := defaultOption()
 	opt.applyOptionFuncs(opts...)
 
-	files, err := g.Generate()
+	loader := load.New(c.Structs)
+	genPkgInfo := g.GenPackageInfo()
+
+	entries, err := os.ReadDir(genPkgInfo.PackageLocation)
+	if err != nil {
+		return nil, err
+	}
+	structInfos := make([]*load.StructInfo, 0)
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		siList, err := loader.Load(filepath.Join(genPkgInfo.PackageLocation, e.Name()))
+		if err != nil {
+			return nil, err
+		}
+		structInfos = append(structInfos, siList...)
+	}
+
+	files, err := g.Generate(structInfos)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generator.Generate: %+w", err)
 	}
@@ -38,11 +62,11 @@ func GenerateWithFormat[G Generator](g G, opts ...OptionFunc) ([]*File, error) {
 	}
 	files = append(files, commonFile)
 
-	genPkgInfo := g.GenPackageInfo()
-	header, err := templates.Execute(templates.TmplHeaderFile, map[string]string{
+	header, err := templates.Execute(templates.TmplHeaderFile, map[string]any{
 		"PackageName": opt.packageName,
 		"GenPkgAlias": genPkgInfo.PackageAlias,
 		"GenPkgPath":  genPkgInfo.PackagePath,
+		"Imports":     c.Imports,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ExecuteTemplate: %+w", err)

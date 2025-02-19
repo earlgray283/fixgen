@@ -1,19 +1,21 @@
-fields:
-  user_name:
-    value: "山田 太郎"
-  user_id:
-    value: 'fmt.Sprintf("user-%d", rand.Int64())'
-
-custom_template:
-  filenames:
-    - "custom_template.go.tmpl"
-  value: |
-    func helper(t *testing.T) {
-      t.Helper()
-    }
+structs:
+  fields:
+    User:
+      Name:
+        # string だったら "value", int だったら 1 と置かれる
+        # value: "callfunc()" にすると "callfunc()" と置かれるので注意
+        value: "山田 太郎"
+      IconURL:
+        expr: 'fmt.Sprintf("http://example.com/images/%d.png", rand.Int64())'
+    Todo:
+      Title:
+        # 式がそのまま置かれる
+        expr: 'fmt.Sprintf("Blog $%d", rand.Int64())'
+        imports:
+          - alias: rand
+            package: "math/rand/v2"
 
 imports:
-  - "github.com/samber/lo"
   - "math/rand/v2"
   - "fmt"
 

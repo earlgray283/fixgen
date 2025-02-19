@@ -11,17 +11,26 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/earlgray283/fixgen/internal/config"
 	fixgen_errors "github.com/earlgray283/fixgen/internal/errors"
 )
 
-func LoadStructInfos(goFilePath string) ([]*StructInfo, error) {
+type StructInfoLoader struct {
+	structConfigs config.Structs
+}
+
+func New(structConfigs config.Structs) *StructInfoLoader {
+	return &StructInfoLoader{structConfigs}
+}
+
+func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, goFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parser.ParseFile: %+w", err)
 	}
 
-	structInfoList := make([]*StructInfo, 0)
+	structInfos := make([]*StructInfo, 0)
 	var parseErr error
 	ast.Inspect(f, func(n ast.Node) bool {
 		genDecl, ok := n.(*ast.GenDecl)
@@ -62,7 +71,8 @@ func LoadStructInfos(goFilePath string) ([]*StructInfo, error) {
 			return false
 		}
 		structInfo.Comments = comments
-		structInfoList = append(structInfoList, structInfo)
+
+		structInfos = append(structInfos, structInfo)
 
 		return true
 	})
@@ -70,7 +80,22 @@ func LoadStructInfos(goFilePath string) ([]*StructInfo, error) {
 		return nil, parseErr
 	}
 
-	return structInfoList, nil
+	for _, si := range structInfos {
+		sc, ok := l.structConfigs[si.Name]
+		if !ok {
+			continue
+		}
+		for _, f := range si.Fields {
+			fc, ok := sc.Fields[f.Name]
+			if !ok {
+				continue
+			}
+			f.DefaultValue = fc.DefaultValue()
+			f.IsOverwritten = true
+		}
+	}
+
+	return structInfos, nil
 }
 
 var regexpTagKeyAndValue = regexp.MustCompile(`(.+):"(.*)"`)

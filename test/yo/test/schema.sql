@@ -1,6 +1,7 @@
 CREATE TABLE Users (
   id INT64 NOT NULL,
   name STRING(MAX) NOT NULL,  
+  icon_url STRING(MAX) NOT NULL,
   created_at TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp=true),
   updated_at TIMESTAMP,
 ) PRIMARY KEY(id);

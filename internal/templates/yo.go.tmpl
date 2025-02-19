@@ -6,7 +6,7 @@ func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *te
     {{ if $f.IsSpannerNullType }} // {{ $f.Name }} is nullable
     {{ else if $f.Type.IsSlice }} // {{ $f.Name }} is slice
     {{ else if not $f.DefaultValue -}} // {{ $f.Name }} does not have a default value,
-    {{ else }} {{ $f.Name }}: {{ $f.DefaultValue }},
+    {{ else }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ if $f.IsOverwritten }} // {{ $f.Name }} is overwritten {{ end }}
     {{ end }}
   {{- end -}}
   }
