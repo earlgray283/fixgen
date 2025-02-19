@@ -4,12 +4,10 @@ package fixture
 
 import (
 	"context"
+	"fmt"
 	"math/rand/v2"
 	"testing"
-
 	yo_gen "yo/models"
-
-	"fmt"
 
 	"cloud.google.com/go/spanner"
 )

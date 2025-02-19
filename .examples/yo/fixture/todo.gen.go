@@ -4,9 +4,9 @@ package fixture
 
 import (
 	"context"
+	"fmt"
 	"math/rand/v2"
 	"testing"
-
 	yo_gen "yo/models"
 
 	"cloud.google.com/go/spanner"
@@ -18,11 +18,12 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 
 	tbl := &yo_gen.Todo{
 		ID:          rand.Int64(),
-		Title:       lo.RandomString(32, lo.AlphanumericCharset),
+		Title:       fmt.Sprintf("Blog $%d", rand.Int64()), // Title is overwritten
 		Description: lo.RandomString(32, lo.AlphanumericCharset),
-		CreatedAt:   spanner.CommitTimestamp,
-		// UpdatedAt is Nullable
-		// DoneAt is Nullable
+		// Tags is slice
+		CreatedAt: spanner.CommitTimestamp,
+		// UpdatedAt is nullable
+		// DoneAt is nullable
 	}
 
 	if isModified(m.ID) {
@@ -33,6 +34,9 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 	}
 	if isModified(m.Description) {
 		tbl.Description = m.Description
+	}
+	if len(m.Tags) > 0 {
+		tbl.Tags = m.Tags
 	}
 	if isModified(m.CreatedAt) {
 		t.Fatal("spanner.CommitTimestamp should be used")

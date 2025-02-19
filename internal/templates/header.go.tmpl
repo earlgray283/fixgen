@@ -6,10 +6,9 @@ import (
   "testing"
   "math/rand/v2"
   "time"
-
   {{ .GenPkgAlias }} "{{.GenPkgPath}}"
-  {{ range $i, $p := .Imports }}
+  "github.com/samber/lo"
+  {{ range $i, $p := .Imports -}}
   {{ $p.Alias }} "{{ $p.Package }}"
   {{ end }}
-  "github.com/samber/lo"
 )

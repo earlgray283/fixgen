@@ -4,10 +4,9 @@ package fixture
 
 import (
 	"context"
+	ent_gen "ent/ent"
 	"math/rand/v2"
 	"testing"
-
-	ent_gen "ent/ent"
 
 	"github.com/samber/lo"
 )
