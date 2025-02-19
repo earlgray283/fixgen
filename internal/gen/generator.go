@@ -15,6 +15,7 @@ import (
 type Generator interface {
 	Generate(si []*load.StructInfo) ([]*File, error)
 	GenPackageInfo() *GenPackageInfo
+	Imports() []*config.Import
 	IsExperimental() bool
 }
 
@@ -66,7 +67,7 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 		"PackageName": opt.packageName,
 		"GenPkgAlias": genPkgInfo.PackageAlias,
 		"GenPkgPath":  genPkgInfo.PackagePath,
-		"Imports":     c.Imports,
+		"Imports":     append(c.Imports, g.Imports()...),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ExecuteTemplate: %+w", err)

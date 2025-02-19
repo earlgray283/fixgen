@@ -9,6 +9,7 @@ import (
 	"go.mercari.io/yo/models"
 
 	"github.com/earlgray283/fixgen/internal/caseconv"
+	"github.com/earlgray283/fixgen/internal/config"
 	"github.com/earlgray283/fixgen/internal/gen"
 	"github.com/earlgray283/fixgen/internal/load"
 	"github.com/earlgray283/fixgen/internal/templates"
@@ -64,6 +65,12 @@ func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
 
 func (g *Generator) IsExperimental() bool {
 	return true
+}
+
+func (g *Generator) Imports() []*config.Import {
+	return []*config.Import{
+		{Package: "cloud.google.com/go/spanner"},
+	}
 }
 
 type Tables map[string]Columns
