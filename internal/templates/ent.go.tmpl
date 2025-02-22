@@ -12,23 +12,17 @@ func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m *ent_gen.{{.TableN
     {{- end -}}
   }
 
+  builder := db.{{.TableName}}.Create()
   {{ range $i, $f := .Fields -}}
-    if
-      {{- if $f.IsModifiedCond }} {{ $f.IsModifiedCond }}
-      {{- else if $f.Type.IsSlice }} len(m.{{ $f.Name }}) > 0
-      {{- else if $f.IsNillable }} m.{{ $f.Name }} != nil
-      {{- else }} isModified(m.{{ $f.Name }})
-      {{- end -}} {
-      tbl.{{ $f.Name }} = m.{{ $f.Name }}
-    }
-  {{ end }}
-
-  builder := db.{{.TableName}}.Create().
-  {{- range $i, $f := .Fields -}}
-    {{ if not $f.HasDefaultOnCreate }}
-      Set{{ $f.Name }}({{- if $f.IsNillable }}*{{ end -}}tbl.{{ $f.Name }}){{ if not $f.IsLast }}.{{ end }}
-    {{- end }}
-  {{- end }}
+  if
+    {{- if $f.IsModifiedCond }} {{ $f.IsModifiedCond }}
+    {{- else if $f.Type.IsSlice }} len(m.{{ $f.Name }}) > 0
+    {{- else if $f.IsNillable }} m.{{ $f.Name }} != nil
+    {{- else }} isModified(m.{{ $f.Name }})
+    {{- end -}} {
+      builder = builder.Set{{ $f.Name }}({{- if $f.IsNillable }}*{{ end -}}tbl.{{ $f.Name }})
+  }
+  {{ end -}}
   for _, opt := range opts {
     opt(builder)
   }

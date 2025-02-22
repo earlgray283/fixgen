@@ -23,27 +23,22 @@ func CreateUser(t *testing.T, db *ent_gen.Client, m *ent_gen.User, opts ...func(
 		// UpdatedAt is nillable
 	}
 
+	builder := db.User.Create()
 	if isModified(m.ID) {
-		tbl.ID = m.ID
+		builder = SetID(tbl.ID)
 	}
 	if isModified(m.Name) {
-		tbl.Name = m.Name
+		builder = SetName(tbl.Name)
 	}
 	if len(m.Bytes) > 0 {
-		tbl.Bytes = m.Bytes
+		builder = SetBytes(tbl.Bytes)
 	}
 	if isModified(m.CreatedAt) {
-		tbl.CreatedAt = m.CreatedAt
+		builder = SetCreatedAt(tbl.CreatedAt)
 	}
 	if m.UpdatedAt != nil {
-		tbl.UpdatedAt = m.UpdatedAt
+		builder = SetUpdatedAt(*tbl.UpdatedAt)
 	}
-
-	builder := db.User.Create().
-		SetID(tbl.ID).
-		SetName(tbl.Name).
-		SetBytes(tbl.Bytes).
-		SetUpdatedAt(*tbl.UpdatedAt)
 	for _, opt := range opts {
 		opt(builder)
 	}

@@ -4,12 +4,12 @@ package fixture
 
 import (
 	"context"
-	"fmt"
 	"math/rand/v2"
 	"testing"
 	yo_gen "yo/models"
 
 	"cloud.google.com/go/spanner"
+	"github.com/samber/lo"
 )
 
 func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
@@ -17,8 +17,8 @@ func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*
 
 	tbl := &yo_gen.User{
 		ID:        rand.Int64(),
-		Name:      "山田 太郎",                                                       // Name is overwritten
-		IconURL:   fmt.Sprintf("http://example.com/images/%d.png", rand.Int64()), // IconURL is overwritten
+		Name:      lo.RandomString(32, lo.AlphanumericCharset),
+		IconURL:   lo.RandomString(32, lo.AlphanumericCharset),
 		CreatedAt: spanner.CommitTimestamp,
 		// UpdatedAt is nullable
 	}
@@ -33,7 +33,7 @@ func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*
 		tbl.IconURL = m.IconURL
 	}
 	if isModified(m.CreatedAt) {
-		t.Fatal("spanner.CommitTimestamp should be used")
+		t.Log("CreatedAt: spanner.CommitTimestamp should be used")
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt

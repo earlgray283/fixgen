@@ -37,7 +37,7 @@ func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*
 		tbl.UserType = m.UserType
 	}
 	if isModified(m.CreatedAt) {
-		t.Fatal("spanner.CommitTimestamp should be used")
+		t.Log("CreatedAt: spanner.CommitTimestamp should be used")
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt
