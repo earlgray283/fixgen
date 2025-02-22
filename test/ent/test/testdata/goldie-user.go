@@ -25,19 +25,19 @@ func CreateUser(t *testing.T, db *ent_gen.Client, m *ent_gen.User, opts ...func(
 
 	builder := db.User.Create()
 	if isModified(m.ID) {
-		builder = SetID(tbl.ID)
+		builder = builder.SetID(tbl.ID)
 	}
 	if isModified(m.Name) {
-		builder = SetName(tbl.Name)
+		builder = builder.SetName(tbl.Name)
 	}
 	if len(m.Bytes) > 0 {
-		builder = SetBytes(tbl.Bytes)
+		builder = builder.SetBytes(tbl.Bytes)
 	}
 	if isModified(m.CreatedAt) {
-		builder = SetCreatedAt(tbl.CreatedAt)
+		builder = builder.SetCreatedAt(tbl.CreatedAt)
 	}
 	if m.UpdatedAt != nil {
-		builder = SetUpdatedAt(*tbl.UpdatedAt)
+		builder = builder.SetUpdatedAt(*tbl.UpdatedAt)
 	}
 	for _, opt := range opts {
 		opt(builder)

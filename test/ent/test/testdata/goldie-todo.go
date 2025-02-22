@@ -26,22 +26,22 @@ func CreateTodo(t *testing.T, db *ent_gen.Client, m *ent_gen.Todo, opts ...func(
 
 	builder := db.Todo.Create()
 	if isModified(m.ID) {
-		builder = SetID(tbl.ID)
+		builder = builder.SetID(tbl.ID)
 	}
 	if isModified(m.Title) {
-		builder = SetTitle(tbl.Title)
+		builder = builder.SetTitle(tbl.Title)
 	}
 	if isModified(m.Description) {
-		builder = SetDescription(tbl.Description)
+		builder = builder.SetDescription(tbl.Description)
 	}
 	if isModified(m.CreatedAt) {
-		builder = SetCreatedAt(tbl.CreatedAt)
+		builder = builder.SetCreatedAt(tbl.CreatedAt)
 	}
 	if m.UpdatedAt != nil {
-		builder = SetUpdatedAt(*tbl.UpdatedAt)
+		builder = builder.SetUpdatedAt(*tbl.UpdatedAt)
 	}
 	if m.DoneAt != nil {
-		builder = SetDoneAt(*tbl.DoneAt)
+		builder = builder.SetDoneAt(*tbl.DoneAt)
 	}
 	for _, opt := range opts {
 		opt(builder)
