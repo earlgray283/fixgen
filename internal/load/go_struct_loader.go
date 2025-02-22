@@ -25,12 +25,14 @@ func New(structConfigs config.Structs) *StructInfoLoader {
 
 func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 	fset := token.NewFileSet()
+
 	f, err := parser.ParseFile(fset, goFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parser.ParseFile: %+w", err)
 	}
 
 	structInfos := make([]*StructInfo, 0)
+
 	var parseErr error
 	ast.Inspect(f, func(n ast.Node) bool {
 		genDecl, ok := n.(*ast.GenDecl)
@@ -92,6 +94,7 @@ func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 			}
 			f.DefaultValue = fc.DefaultValue()
 			f.IsOverwritten = true
+			f.IsModifiedCond = fc.IsModifiedCond
 		}
 	}
 
@@ -105,6 +108,7 @@ func extractTagKeyValue(tag string) (string, string, error) {
 	if len(matches) != 3 {
 		return "", "", fmt.Errorf("failed to extract tag's key and value: `%s`", tag)
 	}
+
 	return matches[1], matches[2], nil
 }
 

@@ -7,40 +7,38 @@ import (
 	ent_gen "ent/ent"
 	"math/rand/v2"
 	"testing"
+	"time"
 
 	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *ent_gen.Client, m ent_gen.User, opts ...func(*ent_gen.UserCreate)) *ent_gen.User {
+func CreateUser(t *testing.T, db *ent_gen.Client, m *ent_gen.User, opts ...func(*ent_gen.UserCreate)) *ent_gen.User {
 	t.Helper()
 
 	tbl := &ent_gen.User{
-		ID:    rand.Int64(),
-		Name:  lo.RandomString(32, lo.AlphanumericCharset),
-		Bytes: []byte(lo.RandomString(32, lo.AlphanumericCharset)),
+		ID:        rand.Int64(),
+		Name:      lo.RandomString(32, lo.AlphanumericCharset),
+		Bytes:     []byte(lo.RandomString(32, lo.AlphanumericCharset)),
+		CreatedAt: time.Now(),
+		// UpdatedAt is nillable
 	}
 
+	builder := db.User.Create()
 	if isModified(m.ID) {
-		tbl.ID = m.ID
+		builder = SetID(tbl.ID)
 	}
 	if isModified(m.Name) {
-		tbl.Name = m.Name
+		builder = SetName(tbl.Name)
 	}
 	if len(m.Bytes) > 0 {
-		tbl.Bytes = m.Bytes
+		builder = SetBytes(tbl.Bytes)
 	}
 	if isModified(m.CreatedAt) {
-		tbl.CreatedAt = m.CreatedAt
+		builder = SetCreatedAt(tbl.CreatedAt)
 	}
 	if m.UpdatedAt != nil {
-		tbl.UpdatedAt = m.UpdatedAt
+		builder = SetUpdatedAt(*tbl.UpdatedAt)
 	}
-
-	builder := db.User.Create().
-		SetID(tbl.ID).
-		SetName(tbl.Name).
-		SetBytes(tbl.Bytes).
-		SetUpdatedAt(*tbl.UpdatedAt)
 	for _, opt := range opts {
 		opt(builder)
 	}

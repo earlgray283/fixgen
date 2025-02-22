@@ -12,13 +12,14 @@ import (
 	"cloud.google.com/go/spanner"
 )
 
-func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
+func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
 	t.Helper()
 
 	tbl := &yo_gen.User{
 		ID:        rand.Int64(),
 		Name:      "Taro Yamada",                                      // Name is overwritten
 		IconURL:   fmt.Sprintf("http://example.com/%d", rand.Int64()), // IconURL is overwritten
+		UserType:  1,                                                  // UserType is overwritten
 		CreatedAt: spanner.CommitTimestamp,
 		// UpdatedAt is nullable
 	}
@@ -32,8 +33,11 @@ func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m yo_gen.
 	if isModified(m.IconURL) {
 		tbl.IconURL = m.IconURL
 	}
+	if m.UserType != 1 {
+		tbl.UserType = m.UserType
+	}
 	if isModified(m.CreatedAt) {
-		t.Fatal("spanner.CommitTimestamp should be used")
+		t.Log("CreatedAt: spanner.CommitTimestamp should be used")
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt

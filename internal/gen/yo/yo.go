@@ -2,6 +2,7 @@ package yo
 
 import (
 	"fmt"
+	"maps"
 	"regexp"
 	"strings"
 
@@ -9,26 +10,25 @@ import (
 	"go.mercari.io/yo/models"
 
 	"github.com/earlgray283/fixgen/internal/caseconv"
-	"github.com/earlgray283/fixgen/internal/config"
 	"github.com/earlgray283/fixgen/internal/gen"
 	"github.com/earlgray283/fixgen/internal/load"
 	"github.com/earlgray283/fixgen/internal/templates"
 )
 
 type Generator struct {
-	yoPackagePath      string
-	genDirPath         string
-	filepaths          []string
-	tables             Tables
-	useContext         bool
-	usePointerModifier bool
+	yoPackagePath string
+	genDirPath    string
+	filepaths     []string
+	tables        Tables
 }
 
-// NewGenerator is a constructor for the struct Generator
-func NewGenerator(workDir string, useContext, usePointerModifier bool) (*Generator, error) {
+var _ gen.Generator = (*Generator)(nil)
+
+// NewGenerator is a constructor for the struct Generator.
+func NewGenerator(workDir string) (*Generator, error) {
 	goModulePath, err := gen.LoadGoModulePath(workDir)
 	if err != nil {
-		return nil, fmt.Errorf(": %+w\n", err)
+		return nil, fmt.Errorf(": %+w", err)
 	}
 
 	genDirPath, filepaths, err := gen.FindAndReadDirByFileName(workDir, "yo_db.yo.go")
@@ -46,12 +46,10 @@ func NewGenerator(workDir string, useContext, usePointerModifier bool) (*Generat
 	}
 
 	return &Generator{
-		yoPackagePath:      strings.Join([]string{goModulePath, genDirPath}, "/"),
-		genDirPath:         genDirPath,
-		filepaths:          filepaths,
-		tables:             tables,
-		useContext:         useContext,
-		usePointerModifier: usePointerModifier,
+		yoPackagePath: strings.Join([]string{goModulePath, genDirPath}, "/"),
+		genDirPath:    genDirPath,
+		filepaths:     filepaths,
+		tables:        tables,
 	}, nil
 }
 
@@ -60,16 +58,6 @@ func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
 		PackagePath:     g.yoPackagePath,
 		PackageAlias:    "yo_gen",
 		PackageLocation: g.genDirPath,
-	}
-}
-
-func (g *Generator) IsExperimental() bool {
-	return true
-}
-
-func (g *Generator) Imports() []*config.Import {
-	return []*config.Import{
-		{Package: "cloud.google.com/go/spanner"},
 	}
 }
 
@@ -103,7 +91,7 @@ func loadYoTables(ddlPath string) (Tables, error) {
 	return tables, nil
 }
 
-func (g *Generator) Generate(structInfos []*load.StructInfo) ([]*gen.File, error) {
+func (g *Generator) Generate(structInfos []*load.StructInfo, data map[string]any) ([]*gen.File, error) {
 	files := make([]*gen.File, 0, len(structInfos))
 
 	yoStructInfos := make([]*structInfo, 0)
@@ -119,7 +107,7 @@ func (g *Generator) Generate(structInfos []*load.StructInfo) ([]*gen.File, error
 	}
 
 	for _, si := range yoStructInfos {
-		file, err := g.execute(si)
+		file, err := g.execute(si, data)
 		if err != nil {
 			return nil, err
 		}
@@ -187,18 +175,21 @@ func extractSQLTableNameFromComments(comments []string) string {
 		if len(matches) < 3 || matches[2] == "" {
 			continue
 		}
+
 		return matches[2]
 	}
+
 	return ""
 }
 
-func (g *Generator) execute(si *structInfo) (*gen.File, error) {
-	content, err := templates.Execute(templates.TmplYoFile, map[string]any{
-		"TableName":          si.tableName,
-		"Fields":             si.fields,
-		"UseContext":         g.useContext,
-		"UsePointerModifier": g.usePointerModifier,
-	})
+func (g *Generator) execute(si *structInfo, data map[string]any) (*gen.File, error) {
+	yoData := map[string]any{
+		"TableName": si.tableName,
+		"Fields":    si.fields,
+	}
+	maps.Copy(yoData, data)
+
+	content, err := templates.Execute(templates.TmplYoFile, yoData)
 	if err != nil {
 		return nil, err
 	}

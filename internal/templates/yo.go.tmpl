@@ -1,23 +1,24 @@
-func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *testing.T, db *spanner.Client, m {{ if .UsePointerModifier }}*{{ end }}yo_gen.{{.TableName}}, opts ...func(*yo_gen.{{ .TableName }})) *yo_gen.{{.TableName}} {
+func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *testing.T, db *spanner.Client, m *yo_gen.{{.TableName}}, opts ...func(*yo_gen.{{ .TableName }})) *yo_gen.{{.TableName}} {
   t.Helper()
 
   tbl := &yo_gen.{{.TableName}} {
   {{ range $i, $f := .Fields -}}
-    {{ if $f.IsSpannerNullType }} // {{ $f.Name }} is nullable
+    {{ if $f.DefaultValue }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ if $f.IsOverwritten }} // {{ $f.Name }} is overwritten {{ end }}
+    {{ else if $f.IsSpannerNullType }} // {{ $f.Name }} is nullable
     {{ else if $f.Type.IsSlice }} // {{ $f.Name }} is slice
-    {{ else if not $f.DefaultValue -}} // {{ $f.Name }} does not have a default value,
-    {{ else }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ if $f.IsOverwritten }} // {{ $f.Name }} is overwritten {{ end }}
+    {{ else -}} // {{ $f.Name }} is unknown
     {{ end }}
   {{- end -}}
   }
 
   {{ range $i, $f := .Fields -}}
   if
-    {{- if $f.IsSpannerNullType }} !m.{{ $f.Name }}.IsNull()
+    {{- if $f.IsModifiedCond }} {{ $f.IsModifiedCond }}
+    {{- else if $f.IsSpannerNullType }} !m.{{ $f.Name }}.IsNull()
     {{- else if $f.Type.IsSlice }} len(m.{{ $f.Name }}) > 0
     {{- else }} isModified(m.{{ $f.Name }})
     {{- end -}} {
-    {{ if $f.AllowCommitTimestamp -}} t.Fatal("spanner.CommitTimestamp should be used")
+    {{ if $f.AllowCommitTimestamp -}} t.Log("{{ $f.Name }}: spanner.CommitTimestamp should be used")
     {{- else -}} tbl.{{ $f.Name }} = m.{{ $f.Name }}
     {{- end }}
   }

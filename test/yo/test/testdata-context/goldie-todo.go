@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateTodo(ctx context.Context, t *testing.T, db *spanner.Client, m yo_gen.Todo, opts ...func(*yo_gen.Todo)) *yo_gen.Todo {
+func CreateTodo(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*yo_gen.Todo)) *yo_gen.Todo {
 	t.Helper()
 
 	tbl := &yo_gen.Todo{
@@ -38,7 +38,7 @@ func CreateTodo(ctx context.Context, t *testing.T, db *spanner.Client, m yo_gen.
 		tbl.Tags = m.Tags
 	}
 	if isModified(m.CreatedAt) {
-		t.Fatal("spanner.CommitTimestamp should be used")
+		t.Log("CreatedAt: spanner.CommitTimestamp should be used")
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt

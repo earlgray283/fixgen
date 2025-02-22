@@ -38,7 +38,7 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 		tbl.Tags = m.Tags
 	}
 	if isModified(m.CreatedAt) {
-		t.Fatal("spanner.CommitTimestamp should be used")
+		t.Log("CreatedAt: spanner.CommitTimestamp should be used")
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt

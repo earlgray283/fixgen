@@ -1,0 +1,8 @@
+linters:
+  enable:
+    - revive
+    - cyclop
+    - unconvert
+    - godot
+    - nilnil
+    - nlreturn

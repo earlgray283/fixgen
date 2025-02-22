@@ -1,28 +1,28 @@
-func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m ent_gen.{{.TableName}}, opts ...func(*ent_gen.{{.TableName}}Create)) *ent_gen.{{.TableName}} {
+func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m *ent_gen.{{.TableName}}, opts ...func(*ent_gen.{{.TableName}}Create)) *ent_gen.{{.TableName}} {
   t.Helper()
 
   tbl := &ent_gen.{{.TableName}} { 
     {{ range $i, $f := .Fields -}}
-      {{ if not $f.Ignore -}}
-        {{ $f.Name }}: {{ $f.DefaultValue }},
-      {{ end -}}
-    {{ end -}}
+      {{ if $f.DefaultValue }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ if $f.IsOverwritten }} // {{ $f.Name }} is overwritten {{ end }}
+      {{ else if $f.HasDefaultOnCreate }} // {{ $f.Name }} has default on create
+      {{ else if $f.Type.IsSlice }} // {{ $f.Name }} is slice
+      {{ else if $f.IsNillable }} // {{ $f.Name }} is nillable
+      {{ else -}} // {{ $f.Name }} is unknown
+      {{ end }}
+    {{- end -}}
   }
 
+  builder := db.{{.TableName}}.Create()
   {{ range $i, $f := .Fields -}}
-    if {{ if $f.Type.IsSlice -}} len(m.{{ $f.Name }}) > 0
-      {{- else if $f.Type.IsNillable -}} m.{{ $f.Name }} != nil
-      {{- else -}} isModified(m.{{ $f.Name }}) {{- end -}} {
-      tbl.{{ $f.Name }} = m.{{ $f.Name }}
-    }
-  {{ end }}
-
-  builder := db.{{.TableName}}.Create().
-  {{ range $i, $f := .Fields -}}
-    {{ if not $f.HasDefaultOnCreate }}
-      Set{{ $f.Name }}({{- if $f.Nillable }}*{{ end -}}tbl.{{ $f.Name }}){{ if not $f.IsLast }}.{{ end }}
-    {{- end }}
-  {{- end }}
+  if
+    {{- if $f.IsModifiedCond }} {{ $f.IsModifiedCond }}
+    {{- else if $f.Type.IsSlice }} len(m.{{ $f.Name }}) > 0
+    {{- else if $f.IsNillable }} m.{{ $f.Name }} != nil
+    {{- else }} isModified(m.{{ $f.Name }})
+    {{- end -}} {
+      builder = builder.Set{{ $f.Name }}({{- if $f.IsNillable }}*{{ end -}}tbl.{{ $f.Name }})
+  }
+  {{ end -}}
   for _, opt := range opts {
     opt(builder)
   }

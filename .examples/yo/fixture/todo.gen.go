@@ -4,7 +4,6 @@ package fixture
 
 import (
 	"context"
-	"fmt"
 	"math/rand/v2"
 	"testing"
 	yo_gen "yo/models"
@@ -18,7 +17,7 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 
 	tbl := &yo_gen.Todo{
 		ID:          rand.Int64(),
-		Title:       fmt.Sprintf("Blog $%d", rand.Int64()), // Title is overwritten
+		Title:       lo.RandomString(32, lo.AlphanumericCharset),
 		Description: lo.RandomString(32, lo.AlphanumericCharset),
 		// Tags is slice
 		CreatedAt: spanner.CommitTimestamp,
@@ -39,7 +38,7 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 		tbl.Tags = m.Tags
 	}
 	if isModified(m.CreatedAt) {
-		t.Fatal("spanner.CommitTimestamp should be used")
+		t.Log("CreatedAt: spanner.CommitTimestamp should be used")
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt

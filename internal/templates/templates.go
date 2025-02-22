@@ -31,10 +31,11 @@ func parseFS(pattern string) *template.Template {
 	return tmpl
 }
 
-func Execute(tmpl *template.Template, data any) ([]byte, error) {
+func Execute(tmpl *template.Template, data map[string]any) ([]byte, error) {
 	buf := &bytes.Buffer{}
 	if err := tmpl.Execute(buf, data); err != nil {
 		return nil, fmt.Errorf("failed to execute template `%s`: %+w", tmpl.Name(), err)
 	}
+
 	return buf.Bytes(), nil
 }
