@@ -33,23 +33,33 @@ func Test_GoldenTest_yo(t *testing.T) {
 		},
 	}
 
-	g, err := gen_yo.NewGenerator(".", false, true)
-	require.NoError(t, err)
-	files, err := gen.GenerateWithFormat(g, c)
-	require.NoError(t, err)
-
-	goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir("testdata"))
-	for _, f := range files {
-		goldie.Assert(t, "goldie-"+f.Name, f.Content)
+	tcs := map[string]struct {
+		opts       []gen.OptionFunc
+		fixtureDir string
+	}{
+		"minimum_option": {
+			fixtureDir: "testdata",
+		},
+		"use-context": {
+			fixtureDir: "testdata-context",
+			opts:       []gen.OptionFunc{gen.UseContext()},
+		},
 	}
 
-	g, err = gen_yo.NewGenerator(".", true, false)
-	require.NoError(t, err)
-	files, err = gen.GenerateWithFormat(g, c)
-	require.NoError(t, err)
+	for name, tc := range tcs {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 
-	goldie = goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir("testdata-context"))
-	for _, f := range files {
-		goldie.Assert(t, "goldie-"+f.Name, f.Content)
+			g, err := gen_yo.NewGenerator(".")
+			require.NoError(t, err)
+			files, err := gen.GenerateWithFormat(g, c, tc.opts...)
+			require.NoError(t, err)
+
+			goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir(tc.fixtureDir))
+			for _, f := range files {
+				goldie.Assert(t, "goldie-"+f.Name, f.Content)
+			}
+		})
 	}
 }

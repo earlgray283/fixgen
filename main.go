@@ -17,15 +17,24 @@ import (
 )
 
 type Flags struct {
-	Prefix                string
-	Ext                   string
-	PackageName           string
-	DestDir               string
-	CleanIfFailed         bool
-	ConfirmIfExperimental bool
-	UseContext            bool
-	UsePointerModifier    bool
-	Config                string
+	Prefix             string
+	Ext                string
+	PackageName        string
+	DestDir            string
+	CleanIfFailed      bool
+	Confirm            bool
+	UseContext         bool
+	UsePointerModifier bool
+	Config             string
+}
+
+func (f *Flags) buildGenOptions() []gen.OptionFunc {
+	opts := make([]gen.OptionFunc, 0)
+	opts = append(opts, gen.WithPackageName(f.PackageName))
+	if f.UseContext {
+		opts = append(opts, gen.UseContext())
+	}
+	return opts
 }
 
 func parseFlags() *Flags {
@@ -36,7 +45,7 @@ func parseFlags() *Flags {
 	flag.StringVar(&f.PackageName, "pkgname", "fixture", "")
 	flag.StringVar(&f.DestDir, "dest-dir", ".", "the path the destination directory is created")
 	flag.BoolVar(&f.CleanIfFailed, "clean-if-failed", false, "clean the directory and files if failed")
-	flag.BoolVar(&f.ConfirmIfExperimental, "confirm-if-experimental", true, "confirm before generation if the generator is experimental")
+	flag.BoolVar(&f.Confirm, "confirm", true, "confirm before generation")
 	flag.BoolVar(&f.UseContext, "use-context", false, "provide `context.Context` argument")
 	flag.BoolVar(&f.UsePointerModifier, "use-pointer-modifier", true, "")
 	flag.StringVar(&f.Config, "config", "fixgen.yaml", "location of a config file")
@@ -61,19 +70,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	generator, err := loadGenerator(generatorType, ".", flgs.UseContext, flgs.UsePointerModifier)
+	generator, err := loadGenerator(generatorType, ".")
 	if err != nil {
 		eprintf("failed to loadGenerator: %v\n", err)
 		os.Exit(1)
 	}
 
-	if flgs.ConfirmIfExperimental && generator.IsExperimental() {
-		if !yesNo(fmt.Sprintf("The generator \"%s\" is experimental.\nProceed?[y/N]", generatorType)) {
+	if flgs.Confirm {
+		if !yesNo("Proceed?[y/N]") {
 			os.Exit(1)
 		}
 	}
 
-	files, err := gen.GenerateWithFormat(generator, c, gen.WithPackageName(flgs.PackageName))
+	files, err := gen.GenerateWithFormat(generator, c, flgs.buildGenOptions()...)
 	if err != nil {
 		eprintf("failed to generator.Generate: %v\n", err)
 		os.Exit(1)
@@ -96,12 +105,12 @@ func main() {
 	}
 }
 
-func loadGenerator(typ, workDir string, useContext, usePointerModifier bool) (gen.Generator, error) {
+func loadGenerator(typ, workDir string) (gen.Generator, error) {
 	switch typ {
 	case "ent":
 		return gen_ent.NewGenerator(workDir)
 	case "yo":
-		return gen_yo.NewGenerator(workDir, useContext, usePointerModifier)
+		return gen_yo.NewGenerator(workDir)
 	default:
 		return nil, fmt.Errorf("unrecognized generator type: %s", typ)
 	}

@@ -25,12 +25,14 @@ func New(structConfigs config.Structs) *StructInfoLoader {
 
 func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 	fset := token.NewFileSet()
+
 	f, err := parser.ParseFile(fset, goFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parser.ParseFile: %+w", err)
 	}
 
 	structInfos := make([]*StructInfo, 0)
+
 	var parseErr error
 	ast.Inspect(f, func(n ast.Node) bool {
 		genDecl, ok := n.(*ast.GenDecl)

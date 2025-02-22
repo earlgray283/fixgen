@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,7 +12,6 @@ import (
 	ent_load "entgo.io/ent/entc/load"
 
 	"github.com/earlgray283/fixgen/internal/caseconv"
-	"github.com/earlgray283/fixgen/internal/config"
 	"github.com/earlgray283/fixgen/internal/gen"
 	"github.com/earlgray283/fixgen/internal/load"
 	"github.com/earlgray283/fixgen/internal/templates"
@@ -22,6 +22,8 @@ type Generator struct {
 	genDirPath     string
 	tables         Tables
 }
+
+var _ gen.Generator = (*Generator)(nil)
 
 func NewGenerator(workDir string) (*Generator, error) {
 	schemaDirPath, genDirPath, err := findEntDirs(workDir)
@@ -77,11 +79,19 @@ func findEntDirs(workDir string) (schemaDirPath, genDirPath string, err error) {
 	return schemaDirPath, genDirPath, nil
 }
 
-func (g *Generator) Generate(structInfos []*load.StructInfo) ([]*gen.File, error) {
+func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
+	return &gen.GenPackageInfo{
+		PackagePath:     g.entPackagePath,
+		PackageAlias:    "ent_gen",
+		PackageLocation: g.genDirPath,
+	}
+}
+
+func (g *Generator) Generate(structInfos []*load.StructInfo, data map[string]any) ([]*gen.File, error) {
 	files := make([]*gen.File, 0)
 
 	for _, si := range structInfos {
-		f, err := g.generate(si)
+		f, err := g.generate(si, data)
 		if err != nil {
 			return nil, err
 		}
@@ -94,29 +104,13 @@ func (g *Generator) Generate(structInfos []*load.StructInfo) ([]*gen.File, error
 	return files, nil
 }
 
-func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
-	return &gen.GenPackageInfo{
-		PackagePath:     g.entPackagePath,
-		PackageAlias:    "ent_gen",
-		PackageLocation: g.genDirPath,
-	}
-}
-
-func (g *Generator) IsExperimental() bool {
-	return true
-}
-
-func (g *Generator) Imports() []*config.Import {
-	return []*config.Import{}
-}
-
-func (g *Generator) generate(si *load.StructInfo) (*gen.File, error) {
+func (g *Generator) generate(si *load.StructInfo, data map[string]any) (*gen.File, error) {
 	columns, ok := g.tables[si.Name]
 	if !ok {
 		return nil, nil
 	}
 
-	fields := make([]*Field, 0, len(si.Fields))
+	fields := make([]*field, 0, len(si.Fields))
 	for _, f := range si.Fields {
 		sqlColumnName := extractSQLColumnName(f.Tags["json"])
 		if sqlColumnName == "" {
@@ -126,7 +120,7 @@ func (g *Generator) generate(si *load.StructInfo) (*gen.File, error) {
 		if !ok {
 			continue
 		}
-		fields = append(fields, &Field{
+		fields = append(fields, &field{
 			Field:              f,
 			Immutable:          column.Immutable,
 			Nillable:           column.Nillable,
@@ -136,16 +130,36 @@ func (g *Generator) generate(si *load.StructInfo) (*gen.File, error) {
 	}
 	fields[len(fields)-1].IsLast = true
 
-	content, err := templates.Execute(templates.TmplEntFile, map[string]any{
-		"TableName": si.Name,
-		"Fields":    fields,
-	})
+	f, err := g.execute(&structInfo{
+		tableName: si.Name,
+		fields:    fields,
+	}, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return f, nil
+}
+
+type structInfo struct {
+	tableName string
+	fields    []*field
+}
+
+func (g *Generator) execute(si *structInfo, data map[string]any) (*gen.File, error) {
+	entData := map[string]any{
+		"TableName": si.tableName,
+		"Fields":    si.fields,
+	}
+	maps.Copy(entData, data)
+
+	content, err := templates.Execute(templates.TmplEntFile, entData)
 	if err != nil {
 		return nil, err
 	}
 
 	return &gen.File{
-		Name:    caseconv.ConvertPascalToSnake(si.Name),
+		Name:    caseconv.ConvertPascalToSnake(si.tableName),
 		Content: content,
 	}, nil
 }
@@ -161,7 +175,7 @@ func extractSQLColumnName(tagValue string) string {
 type Tables map[string]Columns
 type Columns map[string]*ent_load.Field
 
-type Field struct {
+type field struct {
 	*load.Field
 	Immutable          bool
 	Nillable           bool

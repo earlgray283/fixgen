@@ -1,5 +1,3 @@
-spannerContainerName := "fixgen-spanner"
-
 fmt:
     @goimports -w -local="github.com/earlgray283/fixgen" .
     @dprint fmt
@@ -26,14 +24,19 @@ update-example: install
     @cd .examples/yo && rm -rf fixture/* && fixgen yo
     @cd .examples/ent && rm -rf fixture/* && fixgen ent
 
+gen-yo: run-spanner-image
+    @cd ./test/yo/test && go tool yo test-project test-instance test-db -o ./models
+
+spanner_container_name := "fixgen-spanner"
+
 build-spanner-image:
     @docker build -t fixgen-spanner:latest -f ./dockerfiles/Dockerfile_spanner . 
 
 run-spanner-image: build-spanner-image
-    @docker stop {{ spannerContainerName }} 2>/dev/null || :
-    @docker rm {{ spannerContainerName }} 2>/dev/null || :
-    @docker run -d -p 9010:9010 -p 9020:9020 --name {{ spannerContainerName }} fixgen-spanner:latest
-    @docker exec {{ spannerContainerName }} sh -c \
+    @docker stop {{ spanner_container_name }} 2>/dev/null || :
+    @docker rm {{ spanner_container_name }} 2>/dev/null || :
+    @docker run -d -p 9010:9010 -p 9020:9020 --name {{ spanner_container_name }} fixgen-spanner:latest
+    @docker exec {{ spanner_container_name }} sh -c \
       'gcloud spanner instances create test-instance \
         --config=emulator-config --description="Test Instance" --nodes=1 \
       && gcloud spanner databases create test-db \

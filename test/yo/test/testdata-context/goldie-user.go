@@ -12,7 +12,7 @@ import (
 	"cloud.google.com/go/spanner"
 )
 
-func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
+func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
 	t.Helper()
 
 	tbl := &yo_gen.User{

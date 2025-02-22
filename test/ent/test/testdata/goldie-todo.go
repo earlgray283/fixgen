@@ -11,7 +11,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateTodo(t *testing.T, db *ent_gen.Client, m ent_gen.Todo, opts ...func(*ent_gen.TodoCreate)) *ent_gen.Todo {
+func CreateTodo(t *testing.T, db *ent_gen.Client, m *ent_gen.Todo, opts ...func(*ent_gen.TodoCreate)) *ent_gen.Todo {
 	t.Helper()
 
 	tbl := &ent_gen.Todo{

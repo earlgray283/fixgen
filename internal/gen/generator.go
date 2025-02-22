@@ -13,10 +13,8 @@ import (
 )
 
 type Generator interface {
-	Generate(si []*load.StructInfo) ([]*File, error)
 	GenPackageInfo() *GenPackageInfo
-	Imports() []*config.Import
-	IsExperimental() bool
+	Generate(si []*load.StructInfo, data map[string]any) ([]*File, error)
 }
 
 type File struct {
@@ -53,7 +51,9 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 		structInfos = append(structInfos, siList...)
 	}
 
-	files, err := g.Generate(structInfos)
+	files, err := g.Generate(structInfos, map[string]any{
+		"UseContext": opt.useContext,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to generator.Generate: %+w", err)
 	}
@@ -63,12 +63,13 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 	}
 	files = append(files, commonFile)
 
-	header, err := templates.Execute(templates.TmplHeaderFile, map[string]any{
+	data := map[string]any{
 		"PackageName": opt.packageName,
 		"GenPkgAlias": genPkgInfo.PackageAlias,
 		"GenPkgPath":  genPkgInfo.PackagePath,
-		"Imports":     append(c.Imports, g.Imports()...),
-	})
+		"Imports":     c.Imports,
+	}
+	header, err := templates.Execute(templates.TmplHeaderFile, data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to ExecuteTemplate: %+w", err)
 	}
