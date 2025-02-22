@@ -35,7 +35,10 @@ build-spanner-image:
 run-spanner-image: build-spanner-image
     @docker stop {{ spanner_container_name }} 2>/dev/null || :
     @docker rm {{ spanner_container_name }} 2>/dev/null || :
-    @docker run -d -p 9010:9010 -p 9020:9020 --name {{ spanner_container_name }} fixgen-spanner:latest
+    @docker run -d -p 9010:9010 -p 9020:9020 \
+      -v "$(pwd)/test/yo/test/schema.sql":/schema.sql \
+      --name {{ spanner_container_name }} \
+      fixgen-spanner:latest
     @docker exec {{ spanner_container_name }} sh -c \
       'gcloud spanner instances create test-instance \
         --config=emulator-config --description="Test Instance" --nodes=1 \
