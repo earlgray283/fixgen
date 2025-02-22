@@ -33,9 +33,9 @@ func parseFS(pattern string) *template.Template {
 
 func Execute(tmpl *template.Template, data map[string]any) ([]byte, error) {
 	buf := &bytes.Buffer{}
-	tmpl.Option()
 	if err := tmpl.Execute(buf, data); err != nil {
 		return nil, fmt.Errorf("failed to execute template `%s`: %+w", tmpl.Name(), err)
 	}
+
 	return buf.Bytes(), nil
 }
