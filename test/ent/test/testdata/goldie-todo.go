@@ -7,6 +7,7 @@ import (
 	ent_gen "ent/ent"
 	"math/rand/v2"
 	"testing"
+	"time"
 
 	"github.com/samber/lo"
 )
@@ -18,6 +19,9 @@ func CreateTodo(t *testing.T, db *ent_gen.Client, m *ent_gen.Todo, opts ...func(
 		ID:          rand.Int64(),
 		Title:       lo.RandomString(32, lo.AlphanumericCharset),
 		Description: lo.RandomString(32, lo.AlphanumericCharset),
+		CreatedAt:   time.Now(),
+		// UpdatedAt is nillable
+		// DoneAt is nillable
 	}
 
 	if isModified(m.ID) {

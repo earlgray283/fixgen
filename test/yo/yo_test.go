@@ -25,6 +25,10 @@ func Test_GoldenTest_yo(t *testing.T) {
 					"IconURL": {
 						Expr: `fmt.Sprintf("http://example.com/%d", rand.Int64())`,
 					},
+					"UserType": {
+						Value:          1,
+						IsModifiedCond: `m.UserType != 1`,
+					},
 				},
 			},
 		},

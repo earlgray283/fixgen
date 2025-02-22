@@ -20,8 +20,9 @@ type Struct struct {
 }
 
 type Field struct {
-	Value any    `yaml:"value"`
-	Expr  string `yaml:"expr"`
+	Value          any    `yaml:"value"`
+	Expr           string `yaml:"expr"`
+	IsModifiedCond string `yaml:"isModifiedCond"` // should be expr
 }
 
 type Import struct {
@@ -35,6 +36,7 @@ func Load(name string) (*Config, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return newConfig(), nil
 		}
+
 		return nil, err
 	}
 
@@ -56,6 +58,7 @@ func (f *Field) DefaultValue() string {
 	if f.Expr != "" {
 		return f.Expr
 	}
+
 	switch v := f.Value.(type) {
 	case string:
 		return fmt.Sprintf("\"%s\"", v)

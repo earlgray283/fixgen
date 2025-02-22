@@ -2,6 +2,7 @@ CREATE TABLE Users (
   id INT64 NOT NULL,
   name STRING(MAX) NOT NULL,  
   icon_url STRING(MAX) NOT NULL,
+  user_type INT64 NOT NULL, -- 1: General(default), 2: Admin
   created_at TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp=true),
   updated_at TIMESTAMP,
 ) PRIMARY KEY(id);

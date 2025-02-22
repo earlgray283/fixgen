@@ -7,6 +7,7 @@ import (
 	ent_gen "ent/ent"
 	"math/rand/v2"
 	"testing"
+	"time"
 
 	"github.com/samber/lo"
 )
@@ -15,9 +16,11 @@ func CreateUser(t *testing.T, db *ent_gen.Client, m *ent_gen.User, opts ...func(
 	t.Helper()
 
 	tbl := &ent_gen.User{
-		ID:    rand.Int64(),
-		Name:  lo.RandomString(32, lo.AlphanumericCharset),
-		Bytes: []byte(lo.RandomString(32, lo.AlphanumericCharset)),
+		ID:        rand.Int64(),
+		Name:      lo.RandomString(32, lo.AlphanumericCharset),
+		Bytes:     []byte(lo.RandomString(32, lo.AlphanumericCharset)),
+		CreatedAt: time.Now(),
+		// UpdatedAt is nillable
 	}
 
 	if isModified(m.ID) {

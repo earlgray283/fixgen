@@ -122,10 +122,8 @@ func (g *Generator) generate(si *load.StructInfo, data map[string]any) (*gen.Fil
 		}
 		fields = append(fields, &field{
 			Field:              f,
-			Immutable:          column.Immutable,
-			Nillable:           column.Nillable,
+			IsNillable:         column.Nillable,
 			HasDefaultOnCreate: column.Default,
-			Ignore:             column.Immutable || column.Nillable || column.Default || f.DefaultValue == "",
 		})
 	}
 	fields[len(fields)-1].IsLast = true
@@ -177,9 +175,7 @@ type Columns map[string]*ent_load.Field
 
 type field struct {
 	*load.Field
-	Immutable          bool
-	Nillable           bool
+	IsNillable         bool
 	HasDefaultOnCreate bool
-	Ignore             bool
 	IsLast             bool
 }

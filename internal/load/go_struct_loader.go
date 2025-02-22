@@ -94,6 +94,7 @@ func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 			}
 			f.DefaultValue = fc.DefaultValue()
 			f.IsOverwritten = true
+			f.IsModifiedCond = fc.IsModifiedCond
 		}
 	}
 
@@ -107,6 +108,7 @@ func extractTagKeyValue(tag string) (string, string, error) {
 	if len(matches) != 3 {
 		return "", "", fmt.Errorf("failed to extract tag's key and value: `%s`", tag)
 	}
+
 	return matches[1], matches[2], nil
 }
 
