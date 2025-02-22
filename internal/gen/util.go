@@ -15,12 +15,6 @@ func FindAndReadDirByFileName(rootDir, fileName string) (string, []string, error
 	})
 }
 
-func FindDir(rootDir, dirName string) (string, error) {
-	return findByKey(rootDir, func(d fs.DirEntry) bool {
-		return d.IsDir() && d.Name() == dirName
-	})
-}
-
 func FindFile(rootDir, fileName string) (string, error) {
 	return findByKey(rootDir, func(d fs.DirEntry) bool {
 		return !d.IsDir() && d.Name() == fileName
