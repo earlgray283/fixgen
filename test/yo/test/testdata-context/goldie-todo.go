@@ -26,19 +26,15 @@ func CreateTodo(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen
 	}
 
 	if isModified(m.ID) {
-
 		tbl.ID = m.ID
 	}
 	if isModified(m.Title) {
-
 		tbl.Title = m.Title
 	}
 	if isModified(m.Description) {
-
 		tbl.Description = m.Description
 	}
 	if len(m.Tags) > 0 {
-
 		tbl.Tags = m.Tags
 	}
 	if isModified(m.CreatedAt) {
@@ -46,11 +42,9 @@ func CreateTodo(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen
 		tbl.CreatedAt = m.CreatedAt
 	}
 	if !m.UpdatedAt.IsNull() {
-
 		tbl.UpdatedAt = m.UpdatedAt
 	}
 	if !m.DoneAt.IsNull() {
-
 		tbl.DoneAt = m.DoneAt
 	}
 	for _, opt := range opts {

@@ -18,7 +18,7 @@ func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *te
     {{- else if $f.Type.IsSlice -}} len(m.{{ $f.Name }}) > 0
     {{- else -}} isModified(m.{{ $f.Name }})
     {{- end -}} {
-    {{ if $f.AllowCommitTimestamp -}} t.Log("{{ $f.Name }}: spanner.CommitTimestamp should be used") {{- end }}
+    {{- if $f.AllowCommitTimestamp -}} t.Log("{{ $f.Name }}: spanner.CommitTimestamp should be used") {{- end }}
     tbl.{{ $f.Name }} = m.{{ $f.Name }}
   }
   {{ end -}}
