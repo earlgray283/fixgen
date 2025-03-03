@@ -13,12 +13,12 @@ func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *te
 
   {{ range $i, $f := .Fields -}}
   if
-    {{- if $f.IsModifiedCond }} {{ $f.IsModifiedCond }}
-    {{- else if $f.IsSpannerNullType }} !m.{{ $f.Name }}.IsNull()
-    {{- else if $f.Type.IsSlice }} len(m.{{ $f.Name }}) > 0
-    {{- else }} isModified(m.{{ $f.Name }})
+    {{ if $f.IsModifiedCond -}} {{ $f.IsModifiedCond }}
+    {{- else if $f.IsSpannerNullType -}} !m.{{ $f.Name }}.IsNull()
+    {{- else if $f.Type.IsSlice -}} len(m.{{ $f.Name }}) > 0
+    {{- else -}} isModified(m.{{ $f.Name }})
     {{- end -}} {
-    {{ if $f.AllowCommitTimestamp -}} t.Log("{{ $f.Name }}: spanner.CommitTimestamp should be used") {{- end }}
+    {{- if $f.AllowCommitTimestamp -}} t.Log("{{ $f.Name }}: spanner.CommitTimestamp should be used") {{- end }}
     tbl.{{ $f.Name }} = m.{{ $f.Name }}
   }
   {{ end -}}

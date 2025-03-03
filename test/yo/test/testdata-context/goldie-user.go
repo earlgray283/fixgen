@@ -25,19 +25,15 @@ func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen
 	}
 
 	if isModified(m.ID) {
-
 		tbl.ID = m.ID
 	}
 	if isModified(m.Name) {
-
 		tbl.Name = m.Name
 	}
 	if isModified(m.IconURL) {
-
 		tbl.IconURL = m.IconURL
 	}
 	if m.UserType != 1 {
-
 		tbl.UserType = m.UserType
 	}
 	if isModified(m.CreatedAt) {
@@ -45,7 +41,6 @@ func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen
 		tbl.CreatedAt = m.CreatedAt
 	}
 	if !m.UpdatedAt.IsNull() {
-
 		tbl.UpdatedAt = m.UpdatedAt
 	}
 	for _, opt := range opts {
