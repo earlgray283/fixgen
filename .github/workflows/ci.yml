@@ -10,8 +10,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      SPANNER_EMULATOR_HOST: 0.0.0.0:9010
     strategy:
       matrix:
         go-version:
@@ -33,8 +31,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - uses: taiki-e/install-action@just
-      - name: Launch emulators
-        run: just run-spanner-image
       - name: Run test
         run: just test
 

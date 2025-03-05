@@ -50,7 +50,7 @@ run-spanner-image: build-spanner-image
       {{ spanner_image_name }}:latest
     @docker exec {{ spanner_container_name }} \
       gcloud spanner instances create {{ spanner_instance_id }} \
-        --config=emulator-config --description="Test Instance" --nodes=1 \
+        --config=emulator-config --description="Test Instance" --nodes=1
     @docker exec {{ spanner_container_name }} \
       gcloud spanner databases create {{ spanner_database_id }} \
         --instance={{ spanner_instance_id }} --ddl-file=schema.sql
