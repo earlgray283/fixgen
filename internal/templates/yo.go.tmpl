@@ -1,4 +1,4 @@
-func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *testing.T, db *spanner.Client, m *yo_gen.{{.TableName}}, opts ...func(*yo_gen.{{ .TableName }})) *yo_gen.{{.TableName}} {
+func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *testing.T, db *spanner.Client, m {{ if not .UseValueModifier }}*{{ end }}yo_gen.{{.TableName}}, opts ...func(*yo_gen.{{ .TableName }})) *yo_gen.{{.TableName}} {
   t.Helper()
 
   tbl := &yo_gen.{{.TableName}} {

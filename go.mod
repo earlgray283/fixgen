@@ -8,6 +8,7 @@ require (
 	entgo.io/ent v0.14.2
 	github.com/goccy/go-yaml v1.15.23
 	github.com/sebdah/goldie/v2 v2.5.5
+	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.10.0
 	go.mercari.io/yo v0.6.1-0.20250225085724-42672b3e52c2
 	golang.org/x/mod v0.23.0
@@ -39,10 +40,12 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kenshaw/snaker v0.2.0 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.34.0 // indirect

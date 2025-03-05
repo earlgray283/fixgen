@@ -53,7 +53,7 @@ func NewGenerator(workDir string) (*Generator, error) {
 }
 
 func findEntDirs(workDir string) (schemaDirPath, genDirPath string, err error) {
-	if err := fs.WalkDir(os.DirFS(workDir), ".", func(path string, d fs.DirEntry, err error) error {
+	if err := fs.WalkDir(os.DirFS(workDir), ".", func(path string, d fs.DirEntry, _ error) error {
 		if d.IsDir() && d.Name() == "schema" {
 			schemaDirPath = filepath.Join(workDir, path)
 		}
@@ -79,8 +79,8 @@ func findEntDirs(workDir string) (schemaDirPath, genDirPath string, err error) {
 	return schemaDirPath, genDirPath, nil
 }
 
-func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
-	return &gen.GenPackageInfo{
+func (g *Generator) PackageInfo() *gen.PackageInfo {
+	return &gen.PackageInfo{
 		PackagePath:     g.entPackagePath,
 		PackageAlias:    "ent_gen",
 		PackageLocation: g.genDirPath,
@@ -93,6 +93,9 @@ func (g *Generator) Generate(structInfos []*load.StructInfo, data map[string]any
 	for _, si := range structInfos {
 		f, err := g.generate(si, data)
 		if err != nil {
+			if errors.Is(err, gen.ErrNotTargetStruct) {
+				continue
+			}
 			return nil, err
 		}
 		// not target
@@ -107,7 +110,7 @@ func (g *Generator) Generate(structInfos []*load.StructInfo, data map[string]any
 func (g *Generator) generate(si *load.StructInfo, data map[string]any) (*gen.File, error) {
 	columns, ok := g.tables[si.Name]
 	if !ok {
-		return nil, nil
+		return nil, gen.ErrNotTargetStruct
 	}
 
 	fields := make([]*field, 0, len(si.Fields))
@@ -170,8 +173,10 @@ func extractSQLColumnName(tagValue string) string {
 	return strings.TrimSpace(values[0])
 }
 
-type Tables map[string]Columns
-type Columns map[string]*ent_load.Field
+type (
+	Tables  map[string]Columns
+	Columns map[string]*ent_load.Field
+)
 
 type field struct {
 	*load.Field
