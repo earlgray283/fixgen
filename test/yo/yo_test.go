@@ -48,6 +48,10 @@ func Test_GoldenTest_yo(t *testing.T) {
 			fixtureDir: "testdata-context",
 			opts:       []gen.OptionFunc{gen.UseContext()},
 		},
+		"use-value-modifier": {
+			fixtureDir: "testdata-value-modifier",
+			opts:       []gen.OptionFunc{gen.UseValueModifier()},
+		},
 	}
 
 	for name, tc := range tcs {

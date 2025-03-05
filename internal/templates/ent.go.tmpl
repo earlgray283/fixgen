@@ -1,4 +1,4 @@
-func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m *ent_gen.{{.TableName}}, opts ...func(*ent_gen.{{.TableName}}Create)) *ent_gen.{{.TableName}} {
+func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m {{ if not .UseValueModifier }}*{{ end }}ent_gen.{{.TableName}}, opts ...func(*ent_gen.{{.TableName}}Create)) *ent_gen.{{.TableName}} {
   t.Helper()
 
   tbl := &ent_gen.{{.TableName}} { 

@@ -36,7 +36,8 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 	}
 
 	files, err := g.Generate(structInfos, map[string]any{
-		"UseContext": opt.useContext,
+		"UseContext":       opt.useContext,
+		"UseValueModifier": opt.useValueModifier,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to generator.Generate: %+w", err)
