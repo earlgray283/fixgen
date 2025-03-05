@@ -30,7 +30,7 @@ gen-yo: run-spanner-image
 
 spanner_image_name := "fixgen-spanner"
 spanner_container_name := "fixgen-spanner"
-spanner_schema_path := shell("pwd") / shell("fd schema.sql")
+spanner_schema_path := "./test/yo/test/schema.sql"
 spanner_project_id := "test-project"
 spanner_instance_id := "test-instance"
 spanner_database_id := "test-db"
