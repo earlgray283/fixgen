@@ -24,7 +24,6 @@ fixgen yo
 | Extension        | `-ext`                | `.gen.go`     | extension for names of generated Go files                                                                         |
 | PackageName      | `-pkgname`            | `fixture`     | package name for generated Go files                                                                               |
 | DestDir          | `-dest-dir`           | `.`           | destination directory(if DestDir is `foo` and PackageName is `var`, then the directory `foo/var` will be created) |
-| CleanIfFailed    | `-clean-if-failed`    | `false`       | clean generated files and directories if the generation failed                                                    |
 | Confirm          | `-confirm`            | `true`        | confirm before generation                                                                                         |
 | UseContext       | `-use-context`        | `false`       | if `true`, `context.Context` argument will be added to fixture function                                           |
 | UseValueModifier | `-use-value-modifier` | `false`       | if `true`, type of modifier struct will be value                                                                  |
