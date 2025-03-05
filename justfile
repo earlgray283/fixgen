@@ -1,5 +1,6 @@
 fmt:
     @goimports -w -local="github.com/earlgray283/fixgen" .
+    @gofumpt -w .
     @dprint fmt
 
 test:
@@ -27,20 +28,29 @@ update-example: install
 gen-yo: run-spanner-image
     @cd ./test/yo/test && go tool yo test-project test-instance test-db -o ./models
 
+spanner_image_name := "fixgen-spanner"
 spanner_container_name := "fixgen-spanner"
+spanner_schema_path := shell("pwd") / shell("fd schema.sql")
+spanner_project_id := "test-project"
+spanner_instance_id := "test-instance"
+spanner_database_id := "test-db"
 
 build-spanner-image:
-    @docker build -t fixgen-spanner:latest -f ./dockerfiles/Dockerfile_spanner . 
+    @docker build \
+      --build-arg PROJECT_ID={{ spanner_project_id }} \
+      -t {{ spanner_image_name }}:latest \
+      -f ./dockerfiles/Dockerfile_spanner .
 
 run-spanner-image: build-spanner-image
     @docker stop {{ spanner_container_name }} 2>/dev/null || :
     @docker rm {{ spanner_container_name }} 2>/dev/null || :
     @docker run -d -p 9010:9010 -p 9020:9020 \
-      -v "$(pwd)/test/yo/test/schema.sql":/schema.sql \
+      -v {{ spanner_schema_path }}:/schema.sql \
       --name {{ spanner_container_name }} \
-      fixgen-spanner:latest
-    @docker exec {{ spanner_container_name }} sh -c \
-      'gcloud spanner instances create test-instance \
+      {{ spanner_image_name }}:latest
+    @docker exec {{ spanner_container_name }} \
+      gcloud spanner instances create {{ spanner_instance_id }} \
         --config=emulator-config --description="Test Instance" --nodes=1 \
-      && gcloud spanner databases create test-db \
-        --instance=test-instance --ddl-file=schema.sql'
+    @docker exec {{ spanner_container_name }} \
+      gcloud spanner databases create {{ spanner_database_id }} \
+        --instance={{ spanner_instance_id }} --ddl-file=schema.sql

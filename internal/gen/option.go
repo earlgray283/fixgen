@@ -1,14 +1,16 @@
 package gen
 
 type option struct {
-	packageName string // default: "fixture"
-	useContext  bool
+	packageName      string // default: "fixture"
+	useContext       bool
+	useValueModifier bool
 }
 
 func defaultOption() *option {
 	return &option{
-		packageName: "fixture",
-		useContext:  false,
+		packageName:      "fixture",
+		useContext:       false,
+		useValueModifier: false,
 	}
 }
 
@@ -29,5 +31,11 @@ func WithPackageName(packageName string) OptionFunc {
 func UseContext() OptionFunc {
 	return func(o *option) {
 		o.useContext = true
+	}
+}
+
+func UseValueModifier() OptionFunc {
+	return func(o *option) {
+		o.useValueModifier = true
 	}
 }

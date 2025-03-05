@@ -12,7 +12,6 @@ import (
 	"unicode"
 
 	"github.com/earlgray283/fixgen/internal/config"
-	fixgen_errors "github.com/earlgray283/fixgen/internal/errors"
 )
 
 type StructInfoLoader struct {
@@ -21,6 +20,15 @@ type StructInfoLoader struct {
 
 func New(structConfigs config.Structs) *StructInfoLoader {
 	return &StructInfoLoader{structConfigs}
+}
+
+type unsupportedTypeError struct {
+	fieldName string
+	typeName  string
+}
+
+func (e *unsupportedTypeError) Error() string {
+	return fmt.Sprintf("unsupported type error(field: `%s`, type: `%s`)", e.fieldName, e.typeName)
 }
 
 func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
@@ -64,7 +72,7 @@ func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 
 		structInfo, err := parse(ts.Name.Name, st)
 		if err != nil {
-			var uerr *fixgen_errors.UnsupportedTypeError
+			var uerr *unsupportedTypeError
 			if errors.As(err, &uerr) {
 				log.Printf("[WARNING] %v\n", uerr)
 				return true
@@ -134,7 +142,7 @@ func resolveType(name string, exprType ast.Expr) (typ *Type, defaultValue string
 		typ := fmt.Sprintf("[]%s", resolved.Name)
 		return &Type{Name: typ, IsSlice: true}, defaultValueMap[typ], nil
 	default:
-		return nil, "", fixgen_errors.NewUnsupportedTypeError(name, fmt.Sprintf("%T", exprType))
+		return nil, "", &unsupportedTypeError{fieldName: name, typeName: fmt.Sprintf("%T", exprType)}
 	}
 }
 

@@ -1,6 +1,7 @@
 package yo
 
 import (
+	"errors"
 	"fmt"
 	"maps"
 	"regexp"
@@ -53,16 +54,18 @@ func NewGenerator(workDir string) (*Generator, error) {
 	}, nil
 }
 
-func (g *Generator) GenPackageInfo() *gen.GenPackageInfo {
-	return &gen.GenPackageInfo{
+func (g *Generator) PackageInfo() *gen.PackageInfo {
+	return &gen.PackageInfo{
 		PackagePath:     g.yoPackagePath,
 		PackageAlias:    "yo_gen",
 		PackageLocation: g.genDirPath,
 	}
 }
 
-type Tables map[string]Columns
-type Columns map[string]*models.Column
+type (
+	Tables  map[string]Columns
+	Columns map[string]*models.Column
+)
 
 func loadYoTables(ddlPath string) (Tables, error) {
 	yoLoader, err := yo_loaders.NewSpannerLoaderFromDDL(ddlPath)
@@ -98,6 +101,9 @@ func (g *Generator) Generate(structInfos []*load.StructInfo, data map[string]any
 	for _, si := range structInfos {
 		yosi, err := g.parse(si)
 		if err != nil {
+			if errors.Is(err, gen.ErrNotTargetStruct) {
+				continue
+			}
 			return nil, err
 		}
 		if yosi == nil {
@@ -131,7 +137,7 @@ type field struct {
 func (g *Generator) parse(si *load.StructInfo) (*structInfo, error) {
 	sqlTableName := extractSQLTableNameFromComments(si.Comments)
 	if sqlTableName == "" {
-		return nil, nil
+		return nil, gen.ErrNotTargetStruct
 	}
 
 	columns, ok := g.tables[sqlTableName]

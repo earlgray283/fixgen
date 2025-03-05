@@ -12,28 +12,12 @@ import (
 	"github.com/earlgray283/fixgen/internal/templates"
 )
 
-type Generator interface {
-	GenPackageInfo() *GenPackageInfo
-	Generate(si []*load.StructInfo, data map[string]any) ([]*File, error)
-}
-
-type File struct {
-	Name    string
-	Content []byte
-}
-
-type GenPackageInfo struct {
-	PackagePath     string // e.g. github.com/earlgray283/pj-todo/models
-	PackageAlias    string // e.g. yo_gen
-	PackageLocation string
-}
-
 func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) ([]*File, error) {
 	opt := defaultOption()
 	opt.applyOptionFuncs(opts...)
 
 	loader := load.New(c.Structs)
-	genPkgInfo := g.GenPackageInfo()
+	genPkgInfo := g.PackageInfo()
 
 	entries, err := os.ReadDir(genPkgInfo.PackageLocation)
 	if err != nil {
@@ -63,13 +47,12 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 	}
 	files = append(files, commonFile)
 
-	data := map[string]any{
+	header, err := templates.Execute(templates.TmplHeaderFile, map[string]any{
 		"PackageName": opt.packageName,
 		"GenPkgAlias": genPkgInfo.PackageAlias,
 		"GenPkgPath":  genPkgInfo.PackagePath,
 		"Imports":     c.Imports,
-	}
-	header, err := templates.Execute(templates.TmplHeaderFile, data)
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ExecuteTemplate: %+w", err)
 	}
