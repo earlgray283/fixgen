@@ -68,7 +68,7 @@ func NewCommand() *cobra.Command {
 	fs.StringVar(&opts.packageName, "package", "fixture", "package name for the generated files")
 	fs.StringVarP(&opts.destDir, "output", "o", ".", "output directory for the generated files")
 	fs.BoolVarP(&opts.skipConfirm, "skip-confirm", "y", false, "skip confirmation")
-	fs.BoolVar(&opts.useContext, "use-context", false, "add `context.Context` argument for the generated functions")
+	fs.BoolVar(&opts.useContext, "use-context", false, "add context.Context argument for the generated functions")
 	fs.BoolVar(&opts.useValueModifier, "use-value-modifier", false, "use value modifier for the generated functions")
 	fs.StringVarP(&opts.config, "config", "c", "fixgen.yaml", "config file path")
 
