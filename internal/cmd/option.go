@@ -55,7 +55,7 @@ func (t GeneratorType) Validate() error {
 	if t == "" {
 		return errors.New("generatorType is empty")
 	}
-	if slices.Contains(generatorTypes, t) {
+	if !slices.Contains(generatorTypes, t) {
 		return fmt.Errorf("generatorType `%s` is invalid(supported types: %v)", t, generatorTypes)
 	}
 	return nil
