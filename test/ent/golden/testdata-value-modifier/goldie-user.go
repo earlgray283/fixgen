@@ -12,12 +12,12 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *ent_gen.Client, m *ent_gen.User, opts ...func(*ent_gen.UserCreate)) *ent_gen.User {
+func CreateUser(t *testing.T, db *ent_gen.Client, m ent_gen.User, opts ...func(*ent_gen.UserCreate)) *ent_gen.User {
 	t.Helper()
 
 	tbl := &ent_gen.User{
 		ID:        rand.Int64(),
-		Name:      lo.RandomString(32, lo.AlphanumericCharset),
+		Name:      "Taro Yamada", // Name is overwritten
 		Bytes:     []byte(lo.RandomString(32, lo.AlphanumericCharset)),
 		CreatedAt: time.Now(),
 		// UpdatedAt is nillable
