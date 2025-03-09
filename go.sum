@@ -934,8 +934,8 @@ github.com/yuin/goldmark v1.4.1/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/zeebo/assert v1.3.0/go.mod h1:Pq9JiuJQpG8JLJdtkwrJESF0Foym2/D9XMU5ciN/wJ0=
 github.com/zeebo/xxh3 v1.0.2/go.mod h1:5NWz9Sef7zIDm2JHfFlcQvNekmcEl9ekUZQQKCYaDcA=
-go.mercari.io/yo v0.6.1-0.20250225085724-42672b3e52c2 h1:yUc4O9oW7B1FOyOkiSSCLi1hrgjM1Mwvi4KOVeTfqF8=
-go.mercari.io/yo v0.6.1-0.20250225085724-42672b3e52c2/go.mod h1:axbSO3HJ1cHA1f0uWxTPtJT+Dr9P4Fwg4zTtdrUe0D8=
+go.mercari.io/yo v0.6.1 h1:xGgfTKt8ox/ouKRoBD9r6161c0k1agzh3lliPnViQwI=
+go.mercari.io/yo v0.6.1/go.mod h1:axbSO3HJ1cHA1f0uWxTPtJT+Dr9P4Fwg4zTtdrUe0D8=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=

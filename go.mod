@@ -10,7 +10,7 @@ require (
 	github.com/sebdah/goldie/v2 v2.5.5
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.10.0
-	go.mercari.io/yo v0.6.1-0.20250225085724-42672b3e52c2
+	go.mercari.io/yo v0.6.1
 	golang.org/x/mod v0.23.0
 	golang.org/x/tools v0.30.0
 )

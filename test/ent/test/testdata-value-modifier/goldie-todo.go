@@ -12,32 +12,34 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *ent_gen.Client, m *ent_gen.User, opts ...func(*ent_gen.UserCreate)) *ent_gen.User {
+func CreateTodo(t *testing.T, db *ent_gen.Client, m ent_gen.Todo, opts ...func(*ent_gen.TodoCreate)) *ent_gen.Todo {
 	t.Helper()
 
-	tbl := &ent_gen.User{
-		ID:        rand.Int64(),
-		Name:      "Taro Yamada", // Name is overwritten
-		Bytes:     []byte(lo.RandomString(32, lo.AlphanumericCharset)),
-		CreatedAt: time.Now(),
+	tbl := &ent_gen.Todo{
+		ID:          rand.Int64(),
+		Title:       lo.RandomString(32, lo.AlphanumericCharset),
+		Description: lo.RandomString(32, lo.AlphanumericCharset),
+		CreatedAt:   time.Now(),
 		// UpdatedAt is nillable
+		// DoneAt is nillable
 	}
 
-	builder := db.User.Create()
+	builder := db.Todo.Create()
 	if isModified(m.ID) {
 		builder = builder.SetID(tbl.ID)
 	}
-	if isModified(m.Name) {
-		builder = builder.SetName(tbl.Name)
-	}
-	if len(m.Bytes) > 0 {
-		builder = builder.SetBytes(tbl.Bytes)
+	tbl.Title = m.Title // must overwrite
+	if isModified(m.Description) {
+		builder = builder.SetDescription(tbl.Description)
 	}
 	if isModified(m.CreatedAt) {
 		builder = builder.SetCreatedAt(tbl.CreatedAt)
 	}
 	if m.UpdatedAt != nil {
 		builder = builder.SetUpdatedAt(*tbl.UpdatedAt)
+	}
+	if m.DoneAt != nil {
+		builder = builder.SetDoneAt(*tbl.DoneAt)
 	}
 	for _, opt := range opts {
 		opt(builder)

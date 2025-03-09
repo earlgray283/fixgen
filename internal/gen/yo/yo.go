@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"maps"
 	"regexp"
+	"strconv"
 	"strings"
 
 	yo_loaders "go.mercari.io/yo/loaders"
@@ -29,7 +30,7 @@ var _ gen.Generator = (*Generator)(nil)
 func NewGenerator(workDir string) (*Generator, error) {
 	goModulePath, err := gen.LoadGoModulePath(workDir)
 	if err != nil {
-		return nil, fmt.Errorf(": %+w", err)
+		return nil, fmt.Errorf("failed to load go module path: %+w", err)
 	}
 
 	genDirPath, filepaths, err := gen.FindAndReadDirByFileName(workDir, "yo_db.yo.go")
@@ -156,20 +157,61 @@ func (g *Generator) parse(si *load.StructInfo) (*structInfo, error) {
 		if !ok {
 			return nil, fmt.Errorf("failed to get column: %v", sqlColumnName)
 		}
-		if column.AllowCommitTimestamp {
-			f.DefaultValue = "spanner.CommitTimestamp"
+
+		field, err := parseField(f, column)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse field: %+w", err)
 		}
 
-		fields = append(fields, &field{
-			Field:                f,
-			IsSpannerNullType:    strings.HasPrefix(f.Type.Name, "spanner.Null"),
-			AllowCommitTimestamp: column.AllowCommitTimestamp,
-		})
+		fields = append(fields, field)
 	}
 
 	return &structInfo{
 		tableName: si.Name,
 		fields:    fields,
+	}, nil
+}
+
+var (
+	regexpSpannerStringType = regexp.MustCompile(`STRING\((.+)\)`)
+	errLengthIsMax          = errors.New("the length is `MAX`")
+)
+
+func parseSpannerStringType(dataType string) (int, error) {
+	matches := regexpSpannerStringType.FindStringSubmatch(dataType)
+	if len(matches) < 2 || matches[1] == "" {
+		return 0, fmt.Errorf("failed to parse length part")
+	}
+	if matches[1] == "MAX" {
+		return 0, errLengthIsMax
+	}
+	n, err := strconv.ParseInt(matches[1], 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return int(n), nil
+}
+
+func parseField(f *load.Field, c *models.Column) (*field, error) {
+	switch f.Type.Name {
+	case "string":
+		stringLength, err := parseSpannerStringType(c.DataType)
+		if err != nil && !errors.Is(err, errLengthIsMax) {
+			return nil, fmt.Errorf("failed to parse spanner string type `%s`: %+w", c.DataType, err)
+		}
+		if stringLength > 0 {
+			f.DefaultValue = fmt.Sprintf("lo.RandomString(%d, lo.AlphanumericCharset)", stringLength) // TODO: make injectable this
+		}
+	case "time.Time":
+		if c.AllowCommitTimestamp {
+			f.DefaultValue = "spanner.CommitTimestamp"
+		}
+	}
+
+	return &field{
+		Field:                f,
+		IsSpannerNullType:    strings.HasPrefix(f.Type.Name, "spanner.Null"),
+		AllowCommitTimestamp: c.AllowCommitTimestamp,
 	}, nil
 }
 

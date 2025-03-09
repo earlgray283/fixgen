@@ -100,9 +100,13 @@ func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 			if !ok {
 				continue
 			}
-			f.DefaultValue = fc.DefaultValue()
-			f.IsOverwritten = true
+			defaultValue, ok := fc.DefaultValue()
+			if ok {
+				f.DefaultValue = defaultValue
+				f.IsOverwritten = true
+			}
 			f.IsModifiedCond = fc.IsModifiedCond
+			f.MustOverwrite = fc.MustOverwrite
 		}
 	}
 

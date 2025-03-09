@@ -23,6 +23,7 @@ type Field struct {
 	Value          any    `yaml:"value"`
 	Expr           string `yaml:"expr"`
 	IsModifiedCond string `yaml:"isModifiedCond"` // should be expr
+	MustOverwrite  bool   `yaml:"overwrite"`
 }
 
 type Import struct {
@@ -54,15 +55,20 @@ func newConfig() *Config {
 	}
 }
 
-func (f *Field) DefaultValue() string {
+func (f *Field) DefaultValue() (string, bool) {
+	var zero any
+	if f.Expr == "" && f.Value == zero {
+		return "", false
+	}
+
 	if f.Expr != "" {
-		return f.Expr
+		return f.Expr, true
 	}
 
 	switch v := f.Value.(type) {
 	case string:
-		return fmt.Sprintf("\"%s\"", v)
+		return fmt.Sprintf("\"%s\"", v), true
 	default:
-		return fmt.Sprintf("%v", v)
+		return fmt.Sprintf("%v", v), true
 	}
 }
