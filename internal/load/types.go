@@ -13,6 +13,7 @@ type Field struct {
 	Tags           map[string]string
 	IsOverwritten  bool
 	IsModifiedCond string
+	MustOverwrite  bool
 }
 
 type Type struct {

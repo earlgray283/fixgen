@@ -14,6 +14,8 @@ func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m {{ if not .UseValu
 
   builder := db.{{.TableName}}.Create()
   {{ range $i, $f := .Fields -}}
+  {{ if $f.MustOverwrite -}} tbl.{{ $f.Name }} = m.{{ $f.Name }} // must overwrite
+  {{ else -}}
   if
     {{- if $f.IsModifiedCond }} {{ $f.IsModifiedCond }}
     {{- else if $f.Type.IsSlice }} len(m.{{ $f.Name }}) > 0
@@ -23,6 +25,7 @@ func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m {{ if not .UseValu
       builder = builder.Set{{ $f.Name }}({{- if $f.IsNillable }}*{{ end -}}tbl.{{ $f.Name }})
   }
   {{ end -}}
+  {{- end -}}
   for _, opt := range opts {
     opt(builder)
   }

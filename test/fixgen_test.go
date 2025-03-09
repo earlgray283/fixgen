@@ -34,6 +34,13 @@ func Test_GoldenTest(t *testing.T) {
 					},
 				},
 			},
+			"Todo": {
+				Fields: map[string]*config.Field{
+					"Title": {
+						MustOverwrite: true,
+					},
+				},
+			},
 		},
 		Imports: []*config.Import{
 			{Package: "fmt"},

@@ -30,7 +30,7 @@ var _ gen.Generator = (*Generator)(nil)
 func NewGenerator(workDir string) (*Generator, error) {
 	goModulePath, err := gen.LoadGoModulePath(workDir)
 	if err != nil {
-		return nil, fmt.Errorf(": %+w", err)
+		return nil, fmt.Errorf("failed to load go module path: %+w", err)
 	}
 
 	genDirPath, filepaths, err := gen.FindAndReadDirByFileName(workDir, "yo_db.yo.go")

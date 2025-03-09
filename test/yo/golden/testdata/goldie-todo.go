@@ -28,9 +28,7 @@ func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*
 	if isModified(m.ID) {
 		tbl.ID = m.ID
 	}
-	if isModified(m.Title) {
-		tbl.Title = m.Title
-	}
+	tbl.Title = m.Title // must overwrite
 	if isModified(m.Description) {
 		tbl.Description = m.Description
 	}

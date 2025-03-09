@@ -12,6 +12,8 @@ func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *te
   }
 
   {{ range $i, $f := .Fields -}}
+  {{ if $f.MustOverwrite -}} tbl.{{ $f.Name }} = m.{{ $f.Name }} // must overwrite
+  {{ else -}}
   if
     {{ if $f.IsModifiedCond -}} {{ $f.IsModifiedCond }}
     {{- else if $f.IsSpannerNullType -}} !m.{{ $f.Name }}.IsNull()
@@ -22,6 +24,7 @@ func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *te
     tbl.{{ $f.Name }} = m.{{ $f.Name }}
   }
   {{ end -}}
+  {{- end -}}
   for _, opt := range opts {
     opt(tbl)
   }

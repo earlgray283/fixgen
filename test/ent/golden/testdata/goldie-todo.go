@@ -28,9 +28,7 @@ func CreateTodo(t *testing.T, db *ent_gen.Client, m *ent_gen.Todo, opts ...func(
 	if isModified(m.ID) {
 		builder = builder.SetID(tbl.ID)
 	}
-	if isModified(m.Title) {
-		builder = builder.SetTitle(tbl.Title)
-	}
+	tbl.Title = m.Title // must overwrite
 	if isModified(m.Description) {
 		builder = builder.SetDescription(tbl.Description)
 	}
