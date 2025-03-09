@@ -18,7 +18,7 @@ func CreateTodo(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen
 	tbl := &yo_gen.Todo{
 		ID:          rand.Int64(),
 		Title:       lo.RandomString(32, lo.AlphanumericCharset),
-		Description: lo.RandomString(32, lo.AlphanumericCharset),
+		Description: lo.RandomString(16, lo.AlphanumericCharset),
 		// Tags is slice
 		CreatedAt: spanner.CommitTimestamp,
 		// UpdatedAt is nullable
