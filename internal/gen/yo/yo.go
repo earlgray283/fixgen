@@ -193,17 +193,18 @@ func parseSpannerStringType(dataType string) (int, error) {
 }
 
 func parseField(f *load.Field, c *models.Column) (*field, error) {
-	if c.AllowCommitTimestamp {
-		f.DefaultValue = "spanner.CommitTimestamp"
-	}
-
-	if f.Type.Name == "string" {
+	switch f.Type.Name {
+	case "string":
 		stringLength, err := parseSpannerStringType(c.DataType)
 		if err != nil && !errors.Is(err, errLengthIsMax) {
 			return nil, fmt.Errorf("failed to parse spanner string type `%s`: %+w", c.DataType, err)
 		}
 		if stringLength > 0 {
 			f.DefaultValue = fmt.Sprintf("lo.RandomString(%d, lo.AlphanumericCharset)", stringLength) // TODO: make injectable this
+		}
+	case "time.Time":
+		if c.AllowCommitTimestamp {
+			f.DefaultValue = "spanner.CommitTimestamp"
 		}
 	}
 
