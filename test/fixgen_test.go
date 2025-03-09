@@ -79,7 +79,7 @@ func Test_GoldenTest(t *testing.T) {
 					files, err := gen.GenerateWithFormat(g, c, tc.opts...)
 					require.NoError(t, err)
 
-					goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir(filepath.Join(wd, typ, "golden", tc.fixtureDir)))
+					goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir(filepath.Join(wd, typ, "test", tc.fixtureDir)))
 					for _, f := range files {
 						goldie.Assert(t, "goldie-"+f.Name, f.Content)
 					}
