@@ -4,7 +4,6 @@ type option struct {
 	packageName      string // default: "fixture"
 	useContext       bool
 	useValueModifier bool
-	useMathv1        bool
 }
 
 func defaultOption() *option {
@@ -12,7 +11,6 @@ func defaultOption() *option {
 		packageName:      "fixture",
 		useContext:       false,
 		useValueModifier: false,
-		useMathv1:        false,
 	}
 }
 
@@ -39,11 +37,5 @@ func UseContext() OptionFunc {
 func UseValueModifier() OptionFunc {
 	return func(o *option) {
 		o.useValueModifier = true
-	}
-}
-
-func UseMathv1() OptionFunc {
-	return func(o *option) {
-		o.useMathv1 = true
 	}
 }

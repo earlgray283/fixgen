@@ -17,7 +17,6 @@ type Options struct {
 	skipConfirm      bool
 	useContext       bool
 	useValueModifier bool
-	useMathv1        bool
 	config           string
 }
 
@@ -38,9 +37,6 @@ func (o *Options) buildGenOptions() []gen.OptionFunc {
 	}
 	if o.useValueModifier {
 		opts = append(opts, gen.UseValueModifier())
-	}
-	if o.useMathv1 {
-		opts = append(opts, gen.UseMathv1())
 	}
 
 	return opts

@@ -16,6 +16,22 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 	opt := defaultOption()
 	opt.applyOptionFuncs(opts...)
 
+	defaultValueMap := defaultValueMapRandv2
+	useMathv1 := false
+	if c.DefaultValuePolicy != nil {
+		switch c.DefaultValuePolicy.Type {
+		case config.DefaultValuePolicyTypeRandv1:
+			defaultValueMap = defaultValueMapRandv1
+			useMathv1 = true
+		case config.DefaultValuePolicyTypeRandv2:
+			defaultValueMap = defaultValueMapRandv2
+		case config.DefaultValuePolicyTypeZero:
+			defaultValueMap = defaultValueMapZero
+		case config.DefaultValuePolicyTypeCustom:
+			defaultValueMap = c.DefaultValuePolicy.CustomMap
+		}
+	}
+
 	loader := load.New(c.Structs)
 	genPkgInfo := g.PackageInfo()
 
@@ -28,7 +44,7 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 		if e.IsDir() {
 			continue
 		}
-		siList, err := loader.Load(filepath.Join(genPkgInfo.PackageLocation, e.Name()), opt.useMathv1)
+		siList, err := loader.Load(filepath.Join(genPkgInfo.PackageLocation, e.Name()), defaultValueMap)
 		if err != nil {
 			return nil, err
 		}
@@ -53,7 +69,7 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 		"GenPkgAlias": genPkgInfo.PackageAlias,
 		"GenPkgPath":  genPkgInfo.PackagePath,
 		"Imports":     c.Imports,
-		"UseMathv1":   opt.useMathv1,
+		"UseMathv1":   useMathv1,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ExecuteTemplate: %+w", err)
@@ -85,3 +101,42 @@ func Format(content []byte) ([]byte, error) {
 	}
 	return formated, nil
 }
+
+var (
+	defaultValueMapRandv2 = map[string]string{
+		"int32":     "rand.Int32()",
+		"int64":     "rand.Int64()",
+		"uint32":    "rand.Uint32()",
+		"uint64":    "rand.Uint64()",
+		"float32":   "rand.Float32()",
+		"float64":   "rand.Float64()",
+		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
+		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
+		"bool":      "false",
+		"time.Time": "time.Now()",
+	}
+	defaultValueMapRandv1 = map[string]string{
+		"int32":     "rand.Int31()",
+		"int64":     "rand.Int63()",
+		"uint32":    "rand.Uint31()",
+		"uint64":    "rand.Uint63()",
+		"float32":   "rand.Float32()",
+		"float64":   "rand.Float64()",
+		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
+		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
+		"bool":      "false",
+		"time.Time": "time.Now()",
+	}
+	defaultValueMapZero = map[string]string{
+		"int32":     `0`,
+		"int64":     `0`,
+		"uint32":    `0`,
+		"uint64":    `0`,
+		"float32":   `0`,
+		"float64":   `0`,
+		"string":    `""`,
+		"[]byte":    `nil`,
+		"bool":      `false`,
+		"time.Time": `time.Time{}`,
+	}
+)

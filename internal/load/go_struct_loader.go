@@ -31,17 +31,12 @@ func (e *unsupportedTypeError) Error() string {
 	return fmt.Sprintf("unsupported type error(field: `%s`, type: `%s`)", e.fieldName, e.typeName)
 }
 
-func (l *StructInfoLoader) Load(goFilePath string, useRandv1 bool) ([]*StructInfo, error) {
+func (l *StructInfoLoader) Load(goFilePath string, defaultValueMap map[string]string) ([]*StructInfo, error) {
 	fset := token.NewFileSet()
 
 	f, err := parser.ParseFile(fset, goFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parser.ParseFile: %+w", err)
-	}
-
-	defaultValueMap := defaultValueMapRandv2
-	if useRandv1 {
-		defaultValueMap = defaultValueMapRandv1
 	}
 
 	structInfos := make([]*StructInfo, 0)
@@ -206,30 +201,3 @@ func parse(name string, st *ast.StructType, defaultValueMap map[string]string) (
 		Fields: fields,
 	}, nil
 }
-
-var (
-	defaultValueMapRandv2 = map[string]string{
-		"int32":     "rand.Int32()",
-		"int64":     "rand.Int64()",
-		"uint32":    "rand.Uint32()",
-		"uint64":    "rand.Uint64()",
-		"float32":   "rand.Float32()",
-		"float64":   "rand.Float64()",
-		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
-		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
-		"bool":      "false",
-		"time.Time": "time.Now()",
-	}
-	defaultValueMapRandv1 = map[string]string{
-		"int32":     "rand.Int31()",
-		"int64":     "rand.Int63()",
-		"uint32":    "rand.Uint31()",
-		"uint64":    "rand.Uint63()",
-		"float32":   "rand.Float32()",
-		"float64":   "rand.Float64()",
-		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
-		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
-		"bool":      "false",
-		"time.Time": "time.Now()",
-	}
-)

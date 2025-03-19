@@ -7,13 +7,14 @@ type StructInfo struct {
 }
 
 type Field struct {
-	Name           string
-	Type           *Type
-	DefaultValue   string
-	Tags           map[string]string
-	IsOverwritten  bool
-	IsModifiedCond string
-	MustOverwrite  bool
+	Name            string
+	Type            *Type
+	DefaultValue    string
+	HasDefaultValue bool
+	Tags            map[string]string
+	IsOverwritten   bool
+	IsModifiedCond  string
+	MustOverwrite   bool
 }
 
 type Type struct {

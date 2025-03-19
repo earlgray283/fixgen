@@ -18,33 +18,35 @@ func Test_GoldenTest(t *testing.T) {
 	wd, err := os.Getwd()
 	require.NoError(t, err)
 
-	c := &config.Config{
-		Structs: config.Structs{
-			"User": {
-				Fields: map[string]*config.Field{
-					"Name": {
-						Value: "Taro Yamada",
+	commonConfig := func() *config.Config {
+		return &config.Config{
+			Structs: config.Structs{
+				"User": {
+					Fields: map[string]*config.Field{
+						"Name": {
+							Value: "Taro Yamada",
+						},
+						"IconURL": {
+							Expr: `fmt.Sprintf("http://example.com/%d", 123456)`,
+						},
+						"UserType": {
+							Value:          1,
+							IsModifiedCond: `m.UserType != 1`,
+						},
 					},
-					"IconURL": {
-						Expr: `fmt.Sprintf("http://example.com/%d", 123456)`,
-					},
-					"UserType": {
-						Value:          1,
-						IsModifiedCond: `m.UserType != 1`,
+				},
+				"Todo": {
+					Fields: map[string]*config.Field{
+						"Title": {
+							MustOverwrite: true,
+						},
 					},
 				},
 			},
-			"Todo": {
-				Fields: map[string]*config.Field{
-					"Title": {
-						MustOverwrite: true,
-					},
-				},
+			Imports: []*config.Import{
+				{Package: "fmt"},
 			},
-		},
-		Imports: []*config.Import{
-			{Package: "fmt"},
-		},
+		}
 	}
 
 	generators := []string{"yo", "ent"}
@@ -57,6 +59,7 @@ func Test_GoldenTest(t *testing.T) {
 
 			tcs := map[string]struct {
 				opts       []gen.OptionFunc
+				modify     func(*config.Config)
 				fixtureDir string
 			}{
 				"minimum_option": {
@@ -72,13 +75,30 @@ func Test_GoldenTest(t *testing.T) {
 				},
 				"use-math-v1": {
 					fixtureDir: "testdata-math-v1",
-					opts:       []gen.OptionFunc{gen.UseMathv1()},
+					modify: func(c *config.Config) {
+						c.DefaultValuePolicy = &config.DefaultValuePolicy{
+							Type: config.DefaultValuePolicyTypeRandv1,
+						}
+					},
+				},
+				"use-zero": {
+					fixtureDir: "testdata-zero",
+					modify: func(c *config.Config) {
+						c.DefaultValuePolicy = &config.DefaultValuePolicy{
+							Type: config.DefaultValuePolicyTypeZero,
+						}
+					},
 				},
 			}
 
 			for name, tc := range tcs {
 				tc := tc
 				t.Run(name, func(t *testing.T) {
+					c := commonConfig()
+					if tc.modify != nil {
+						tc.modify(c)
+					}
+
 					g := mustNewGenerator(t, typ)
 					files, err := gen.GenerateWithFormat(g, c, tc.opts...)
 					require.NoError(t, err)
