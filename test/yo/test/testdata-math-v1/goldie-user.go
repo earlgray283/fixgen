@@ -5,18 +5,18 @@ package fixture
 import (
 	"context"
 	"fmt"
-	"math/rand/v2"
+	"math/rand"
 	"testing"
 	yo_gen "yo/models"
 
 	"cloud.google.com/go/spanner"
 )
 
-func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
+func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
 	t.Helper()
 
 	tbl := &yo_gen.User{
-		ID:        rand.Int64(),
+		ID:        rand.Int63(),
 		Name:      "Taro Yamada",                                // Name is overwritten
 		IconURL:   fmt.Sprintf("http://example.com/%d", 123456), // IconURL is overwritten
 		UserType:  1,                                            // UserType is overwritten
@@ -47,7 +47,7 @@ func CreateUser(ctx context.Context, t *testing.T, db *spanner.Client, m *yo_gen
 		opt(tbl)
 	}
 
-	_, err := db.ReadWriteTransaction(ctx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+	_, err := db.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
 		return tx.BufferWrite([]*spanner.Mutation{tbl.Insert(ctx)})
 	})
 	if err != nil {

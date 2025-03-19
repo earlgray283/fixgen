@@ -17,9 +17,9 @@ func CreateUser(t *testing.T, db *spanner.Client, m *yo_gen.User, opts ...func(*
 
 	tbl := &yo_gen.User{
 		ID:        rand.Int64(),
-		Name:      "Taro Yamada",                                      // Name is overwritten
-		IconURL:   fmt.Sprintf("http://example.com/%d", rand.Int64()), // IconURL is overwritten
-		UserType:  1,                                                  // UserType is overwritten
+		Name:      "Taro Yamada",                                // Name is overwritten
+		IconURL:   fmt.Sprintf("http://example.com/%d", 123456), // IconURL is overwritten
+		UserType:  1,                                            // UserType is overwritten
 		CreatedAt: spanner.CommitTimestamp,
 		// UpdatedAt is nullable
 	}

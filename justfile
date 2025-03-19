@@ -10,7 +10,7 @@ test-golden:
     @go test ./test -run="^Test_GoldenTest"
 
 update-golden:
-    @go test ./test -run="^Test_GoldenTest" -update
+    @go test -v ./test -run="^Test_GoldenTest" -update
 
 install:
     @go install .

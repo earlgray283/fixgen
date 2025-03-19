@@ -31,12 +31,17 @@ func (e *unsupportedTypeError) Error() string {
 	return fmt.Sprintf("unsupported type error(field: `%s`, type: `%s`)", e.fieldName, e.typeName)
 }
 
-func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
+func (l *StructInfoLoader) Load(goFilePath string, useRandv1 bool) ([]*StructInfo, error) {
 	fset := token.NewFileSet()
 
 	f, err := parser.ParseFile(fset, goFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parser.ParseFile: %+w", err)
+	}
+
+	defaultValueMap := defaultValueMapRandv2
+	if useRandv1 {
+		defaultValueMap = defaultValueMapRandv1
 	}
 
 	structInfos := make([]*StructInfo, 0)
@@ -70,7 +75,7 @@ func (l *StructInfoLoader) Load(goFilePath string) ([]*StructInfo, error) {
 			return true
 		}
 
-		structInfo, err := parse(ts.Name.Name, st)
+		structInfo, err := parse(ts.Name.Name, st, defaultValueMap)
 		if err != nil {
 			var uerr *unsupportedTypeError
 			if errors.As(err, &uerr) {
@@ -124,7 +129,7 @@ func extractTagKeyValue(tag string) (string, string, error) {
 	return matches[1], matches[2], nil
 }
 
-func resolveType(name string, exprType ast.Expr) (typ *Type, defaultValue string, err error) {
+func resolveType(name string, exprType ast.Expr, defaultValueMap map[string]string) (typ *Type, defaultValue string, err error) {
 	switch ty := exprType.(type) {
 	case *ast.Ident: // TODO: resolve struct type
 		typ := ty.Name
@@ -133,13 +138,13 @@ func resolveType(name string, exprType ast.Expr) (typ *Type, defaultValue string
 		typ := fmt.Sprintf("%s.%s", ty.X.(*ast.Ident).Name, ty.Sel.Name)
 		return &Type{Name: typ}, defaultValueMap[typ], nil
 	case *ast.StarExpr:
-		resolved, _, err := resolveType(name, ty.X)
+		resolved, _, err := resolveType(name, ty.X, defaultValueMap)
 		if err != nil {
 			return nil, "", err
 		}
 		return &Type{Name: fmt.Sprintf("*%s", resolved.Name), IsNillable: true}, "", nil
 	case *ast.ArrayType:
-		resolved, _, err := resolveType(name, ty.Elt)
+		resolved, _, err := resolveType(name, ty.Elt, defaultValueMap)
 		if err != nil {
 			return nil, "", err
 		}
@@ -150,7 +155,7 @@ func resolveType(name string, exprType ast.Expr) (typ *Type, defaultValue string
 	}
 }
 
-func parse(name string, st *ast.StructType) (*StructInfo, error) {
+func parse(name string, st *ast.StructType, defaultValueMap map[string]string) (*StructInfo, error) {
 	fields := make([]*Field, 0, len(st.Fields.List))
 	for _, f := range st.Fields.List {
 		names := make([]string, 0, len(f.Names))
@@ -158,7 +163,7 @@ func parse(name string, st *ast.StructType) (*StructInfo, error) {
 			names = append(names, n.Name)
 		}
 
-		typ, defaultValue, err := resolveType(strings.Join(names, ", "), f.Type)
+		typ, defaultValue, err := resolveType(strings.Join(names, ", "), f.Type, defaultValueMap)
 		if err != nil {
 			return nil, fmt.Errorf("failed to resolve type: %+w", err)
 		}
@@ -202,15 +207,29 @@ func parse(name string, st *ast.StructType) (*StructInfo, error) {
 	}, nil
 }
 
-var defaultValueMap = map[string]string{
-	"int32":     "rand.Int32()",
-	"int64":     "rand.Int64()",
-	"uint32":    "rand.Uint32()",
-	"uint64":    "rand.Uint64()",
-	"float32":   "rand.Float32()",
-	"float64":   "rand.Float64()",
-	"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
-	"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
-	"bool":      "false",
-	"time.Time": "time.Now()",
-}
+var (
+	defaultValueMapRandv2 = map[string]string{
+		"int32":     "rand.Int32()",
+		"int64":     "rand.Int64()",
+		"uint32":    "rand.Uint32()",
+		"uint64":    "rand.Uint64()",
+		"float32":   "rand.Float32()",
+		"float64":   "rand.Float64()",
+		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
+		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
+		"bool":      "false",
+		"time.Time": "time.Now()",
+	}
+	defaultValueMapRandv1 = map[string]string{
+		"int32":     "rand.Int31()",
+		"int64":     "rand.Int63()",
+		"uint32":    "rand.Uint31()",
+		"uint64":    "rand.Uint63()",
+		"float32":   "rand.Float32()",
+		"float64":   "rand.Float64()",
+		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
+		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
+		"bool":      "false",
+		"time.Time": "time.Now()",
+	}
+)

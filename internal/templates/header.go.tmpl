@@ -4,7 +4,7 @@ package {{.PackageName}}
 
 import (
   "testing"
-  "math/rand/v2"
+  {{ if not .UseMathv1 }} "math/rand/v2" {{ else }} "math/rand" {{ end }}
   "time"
   {{ .GenPkgAlias }} "{{.GenPkgPath}}"
   "github.com/samber/lo"

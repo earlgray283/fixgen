@@ -4,37 +4,36 @@ package fixture
 
 import (
 	"context"
-	"fmt"
-	"math/rand/v2"
+	"math/rand"
 	"testing"
 	yo_gen "yo/models"
 
 	"cloud.google.com/go/spanner"
+	"github.com/samber/lo"
 )
 
-func CreateUser(t *testing.T, db *spanner.Client, m yo_gen.User, opts ...func(*yo_gen.User)) *yo_gen.User {
+func CreateTodo(t *testing.T, db *spanner.Client, m *yo_gen.Todo, opts ...func(*yo_gen.Todo)) *yo_gen.Todo {
 	t.Helper()
 
-	tbl := &yo_gen.User{
-		ID:        rand.Int64(),
-		Name:      "Taro Yamada",                                // Name is overwritten
-		IconURL:   fmt.Sprintf("http://example.com/%d", 123456), // IconURL is overwritten
-		UserType:  1,                                            // UserType is overwritten
+	tbl := &yo_gen.Todo{
+		ID:          rand.Int63(),
+		Title:       lo.RandomString(32, lo.AlphanumericCharset),
+		Description: lo.RandomString(16, lo.AlphanumericCharset),
+		// Tags is slice
 		CreatedAt: spanner.CommitTimestamp,
 		// UpdatedAt is nullable
+		// DoneAt is nullable
 	}
 
 	if isModified(m.ID) {
 		tbl.ID = m.ID
 	}
-	if isModified(m.Name) {
-		tbl.Name = m.Name
+	tbl.Title = m.Title // must overwrite
+	if isModified(m.Description) {
+		tbl.Description = m.Description
 	}
-	if isModified(m.IconURL) {
-		tbl.IconURL = m.IconURL
-	}
-	if m.UserType != 1 {
-		tbl.UserType = m.UserType
+	if len(m.Tags) > 0 {
+		tbl.Tags = m.Tags
 	}
 	if isModified(m.CreatedAt) {
 		t.Log("CreatedAt: spanner.CommitTimestamp should be used")
@@ -42,6 +41,9 @@ func CreateUser(t *testing.T, db *spanner.Client, m yo_gen.User, opts ...func(*y
 	}
 	if !m.UpdatedAt.IsNull() {
 		tbl.UpdatedAt = m.UpdatedAt
+	}
+	if !m.DoneAt.IsNull() {
+		tbl.DoneAt = m.DoneAt
 	}
 	for _, opt := range opts {
 		opt(tbl)

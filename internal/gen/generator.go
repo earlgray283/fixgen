@@ -28,7 +28,7 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 		if e.IsDir() {
 			continue
 		}
-		siList, err := loader.Load(filepath.Join(genPkgInfo.PackageLocation, e.Name()))
+		siList, err := loader.Load(filepath.Join(genPkgInfo.PackageLocation, e.Name()), opt.useMathv1)
 		if err != nil {
 			return nil, err
 		}
@@ -53,6 +53,7 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 		"GenPkgAlias": genPkgInfo.PackageAlias,
 		"GenPkgPath":  genPkgInfo.PackagePath,
 		"Imports":     c.Imports,
+		"UseMathv1":   opt.useMathv1,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to ExecuteTemplate: %+w", err)

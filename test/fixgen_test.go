@@ -26,7 +26,7 @@ func Test_GoldenTest(t *testing.T) {
 						Value: "Taro Yamada",
 					},
 					"IconURL": {
-						Expr: `fmt.Sprintf("http://example.com/%d", rand.Int64())`,
+						Expr: `fmt.Sprintf("http://example.com/%d", 123456)`,
 					},
 					"UserType": {
 						Value:          1,
@@ -69,6 +69,10 @@ func Test_GoldenTest(t *testing.T) {
 				"use-value-modifier": {
 					fixtureDir: "testdata-value-modifier",
 					opts:       []gen.OptionFunc{gen.UseValueModifier()},
+				},
+				"use-math-v1": {
+					fixtureDir: "testdata-math-v1",
+					opts:       []gen.OptionFunc{gen.UseMathv1()},
 				},
 			}
 
