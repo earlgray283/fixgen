@@ -9,15 +9,15 @@ import (
 )
 
 type Config struct {
-	RandPackage        string              `yaml:"randPackage"`
-	DefaultValuePolicy *DefaultValuePolicy `yaml:"defaultValuePolicy"`
-	Structs            Structs             `yaml:"structs"`
-	Imports            []*Import           `yaml:"imports"`
+	RandPackage        string              `yaml:"randPackage,omitempty"`
+	DefaultValuePolicy *DefaultValuePolicy `yaml:"defaultValuePolicy,omitempty"`
+	Structs            Structs             `yaml:"structs,omitempty"`
+	Imports            []*Import           `yaml:"imports,omitempty"`
 }
 
 type DefaultValuePolicy struct {
-	Type      DefaultValuePolicyType `yaml:"type"`
-	CustomMap map[string]string      `yaml:"customMap"`
+	Type      DefaultValuePolicyType `yaml:"type,omitempty"`
+	CustomMap map[string]string      `yaml:"customMap,omitempty"`
 }
 
 type DefaultValuePolicyType string
@@ -32,19 +32,19 @@ const (
 type Structs map[string]*Struct
 
 type Struct struct {
-	Fields map[string]*Field `yaml:"fields"`
+	Fields map[string]*Field `yaml:"fields,omitempty"`
 }
 
 type Field struct {
-	Value          any    `yaml:"value"`
-	Expr           string `yaml:"expr"`
-	IsModifiedCond string `yaml:"isModifiedCond"` // should be expr
-	MustOverwrite  bool   `yaml:"overwrite"`
+	Value          any    `yaml:"value,omitempty"`
+	Expr           string `yaml:"expr,omitempty"`
+	IsModifiedCond string `yaml:"isModifiedCond,omitempty"` // should be expr
+	MustOverwrite  bool   `yaml:"overwrite,omitempty"`
 }
 
 type Import struct {
-	Alias   string `yaml:"alias"`
-	Package string `yaml:"package"`
+	Alias   string `yaml:"alias,omitempty"`
+	Package string `yaml:"package,omitempty"`
 }
 
 func Load(name string) (*Config, error) {
