@@ -3,6 +3,7 @@ package datastore
 import (
 	"fmt"
 	"maps"
+	"path/filepath"
 	"strings"
 
 	"github.com/earlgray283/fixgen/internal/caseconv"
@@ -30,8 +31,13 @@ func NewGenerator(workDir, packageDirPath string) (*Generator, error) {
 		return nil, fmt.Errorf("failed to read dir: %+w", err)
 	}
 
+	rel, err := filepath.Rel(".", packageDirPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get relative path: %+w", err)
+	}
+
 	return &Generator{
-		packagePath: strings.Join([]string{goModulePath, packageDirPath}, "/"),
+		packagePath: strings.Join([]string{goModulePath, rel}, "/"),
 		dirPath:     packageDirPath,
 		filepaths:   filepaths,
 	}, nil

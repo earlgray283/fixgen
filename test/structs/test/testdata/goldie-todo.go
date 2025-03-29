@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func CreateTodo(t *testing.T, db Inserter, m *structs_gen.Todo, opts ...func(*structs_gen.Todo)) *structs_gen.Todo {
+func CreateTodo(t *testing.T, db Inserter[*structs_gen.Todo], m *structs_gen.Todo, opts ...func(*structs_gen.Todo)) *structs_gen.Todo {
 	t.Helper()
 
 	tbl := &structs_gen.Todo{

@@ -1,4 +1,4 @@
-func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *testing.T, db Inserter, m {{ if not .UseValueModifier }}*{{ end }}structs_gen.{{.TableName}}, opts ...func(*structs_gen.{{ .TableName }})) *structs_gen.{{.TableName}} {
+func Create{{.TableName}}({{ if .UseContext}}ctx context.Context,{{ end }} t *testing.T, db Inserter[*structs_gen.{{ .TableName }}], m {{ if not .UseValueModifier }}*{{ end }}structs_gen.{{.TableName}}, opts ...func(*structs_gen.{{ .TableName }})) *structs_gen.{{.TableName}} {
   t.Helper()
 
   tbl := &structs_gen.{{.TableName}} {
