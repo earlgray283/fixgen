@@ -12,6 +12,7 @@ import (
 	"github.com/earlgray283/fixgen/internal/config"
 	"github.com/earlgray283/fixgen/internal/gen"
 	gen_ent "github.com/earlgray283/fixgen/internal/gen/ent"
+	gen_structs "github.com/earlgray283/fixgen/internal/gen/structs"
 	gen_yo "github.com/earlgray283/fixgen/internal/gen/yo"
 )
 
@@ -50,7 +51,7 @@ func Test_GoldenTest(t *testing.T) {
 		}
 	}
 
-	generators := []string{"yo", "ent"}
+	generators := []string{"yo", "ent", "structs"}
 
 	for _, typ := range generators {
 		testDir := filepath.Join(wd, typ, "test")
@@ -131,6 +132,8 @@ func mustNewGenerator(t *testing.T, typ string) gen.Generator {
 		g, err = gen_yo.NewGenerator(".")
 	case "ent":
 		g, err = gen_ent.NewGenerator(".")
+	case "structs":
+		g, err = gen_structs.NewGenerator(".", "models")
 	default:
 		t.Fatalf("unrecognized generator type `%s`", typ)
 	}

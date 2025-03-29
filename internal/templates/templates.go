@@ -9,11 +9,13 @@ import (
 
 var (
 	//go:embed *
-	embedFs        embed.FS
-	TmplEntFile    *template.Template
-	TmplYoFile     *template.Template
-	TmplCommonFile *template.Template
-	TmplHeaderFile *template.Template
+	embedFs               embed.FS
+	TmplEntFile           *template.Template
+	TmplYoFile            *template.Template
+	TmplCommonFile        *template.Template
+	TmplHeaderFile        *template.Template
+	TmplStructsFile       *template.Template
+	TmplStructsCommonFile *template.Template
 )
 
 func init() {
@@ -21,6 +23,8 @@ func init() {
 	TmplYoFile = parseFS("yo.go.tmpl")
 	TmplCommonFile = parseFS("common.go.tmpl")
 	TmplHeaderFile = parseFS("header.go.tmpl")
+	TmplStructsFile = parseFS("structs.go.tmpl")
+	TmplStructsCommonFile = parseFS("structs_common.go.tmpl")
 }
 
 func parseFS(pattern string) *template.Template {

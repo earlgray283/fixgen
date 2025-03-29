@@ -78,7 +78,7 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 	for _, f := range files {
 		content, err := Format(append(header, f.Content...))
 		if err != nil {
-			return nil, fmt.Errorf("failed to Format: %+w", err)
+			return nil, fmt.Errorf("failed to Format(%s): %+w", f.Name, err)
 		}
 		f.Content = content
 	}
