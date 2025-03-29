@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func CreateUser(ctx context.Context, t *testing.T, db Inserter, m *structs_gen.User, opts ...func(*structs_gen.User)) *yo_gen.User {
+func CreateUser(ctx context.Context, t *testing.T, db Inserter, m *structs_gen.User, opts ...func(*structs_gen.User)) *structs_gen.User {
 	t.Helper()
 
 	tbl := &structs_gen.User{
