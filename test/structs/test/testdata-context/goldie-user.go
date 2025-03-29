@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand/v2"
+	structs_gen "structs/models"
 	"testing"
 	"time"
 )

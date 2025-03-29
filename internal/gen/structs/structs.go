@@ -83,7 +83,7 @@ func (g *Generator) execute(si *load.StructInfo, data map[string]any) (*gen.File
 func (g *Generator) PackageInfo() *gen.PackageInfo {
 	return &gen.PackageInfo{
 		PackagePath:     g.packagePath,
-		PackageAlias:    "structs",
+		PackageAlias:    "structs_gen",
 		PackageLocation: g.dirPath,
 	}
 }

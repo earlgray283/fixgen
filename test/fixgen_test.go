@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/goccy/go-yaml"
 	goldiev2 "github.com/sebdah/goldie/v2"
 	"github.com/stretchr/testify/require"
 
@@ -104,10 +105,10 @@ func Test_GoldenTest(t *testing.T) {
 					files, err := gen.GenerateWithFormat(g, c, tc.opts...)
 					require.NoError(t, err)
 
-					// f, err := os.Create(filepath.Join(wd, typ, "test", tc.fixtureDir, "fixgen.yaml"))
-					// require.NoError(t, err)
-					// defer f.Close()
-					// require.NoError(t, yaml.NewEncoder(f).Encode(c))
+					f, err := os.Create(filepath.Join(wd, typ, "test", tc.fixtureDir, "fixgen.yaml"))
+					require.NoError(t, err)
+					defer f.Close()
+					require.NoError(t, yaml.NewEncoder(f).Encode(c))
 
 					goldie := goldiev2.New(t, goldiev2.WithDiffEngine(goldiev2.ColoredDiff), goldiev2.WithNameSuffix(".go"), goldiev2.WithFixtureDir(filepath.Join(wd, typ, "test", tc.fixtureDir)))
 					for _, f := range files {

@@ -5,6 +5,7 @@ package fixture
 import (
 	"context"
 	"fmt"
+	structs_gen "structs/models"
 	"testing"
 	"time"
 )
