@@ -203,7 +203,7 @@ func parseField(f *load.Field, c *models.Column) (*field, error) {
 			f.DefaultValue = fmt.Sprintf("lo.RandomString(%d, lo.AlphanumericCharset)", stringLength) // TODO: make injectable this
 		}
 	case "time.Time":
-		if c.AllowCommitTimestamp {
+		if c.IsAllowCommitTimestamp {
 			f.DefaultValue = "spanner.CommitTimestamp"
 		}
 	}
@@ -211,7 +211,7 @@ func parseField(f *load.Field, c *models.Column) (*field, error) {
 	return &field{
 		Field:                f,
 		IsSpannerNullType:    strings.HasPrefix(f.Type.Name, "spanner.Null"),
-		AllowCommitTimestamp: c.AllowCommitTimestamp,
+		AllowCommitTimestamp: c.IsAllowCommitTimestamp,
 	}, nil
 }
 
