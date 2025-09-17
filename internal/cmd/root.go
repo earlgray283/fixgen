@@ -11,6 +11,7 @@ import (
 	"github.com/earlgray283/fixgen/internal/config"
 	"github.com/earlgray283/fixgen/internal/gen"
 	gen_ent "github.com/earlgray283/fixgen/internal/gen/ent"
+	gen_structs "github.com/earlgray283/fixgen/internal/gen/structs"
 	gen_yo "github.com/earlgray283/fixgen/internal/gen/yo"
 	"github.com/spf13/cobra"
 )
@@ -32,8 +33,11 @@ func NewCommand() *cobra.Command {
 			if err := generatorType.Validate(); err != nil {
 				return fmt.Errorf("%+w", err)
 			}
+			if generatorType == GeneratorTypeStructs && opts.targetDir == "" {
+				return errors.New("`--target-dir` is required for structs generator")
+			}
 
-			generator, err := loadGenerator(generatorType, ".")
+			generator, err := loadGenerator(generatorType, ".", opts.targetDir)
 			if err != nil {
 				return fmt.Errorf("failed to load generator: %+w", err)
 			}
@@ -71,16 +75,19 @@ func NewCommand() *cobra.Command {
 	fs.BoolVar(&opts.useContext, "use-context", false, "add context.Context argument for the generated functions")
 	fs.BoolVar(&opts.useValueModifier, "use-value-modifier", false, "use value modifier for the generated functions")
 	fs.StringVarP(&opts.config, "config", "c", "fixgen.yaml", "config file path")
+	fs.StringVar(&opts.targetDir, "target-dir", "", "target directory for the generated files")
 
 	return cmd
 }
 
-func loadGenerator(typ GeneratorType, workDir string) (gen.Generator, error) {
+func loadGenerator(typ GeneratorType, workDir, targetDir string) (gen.Generator, error) {
 	switch typ {
 	case GeneratorTypeEnt:
 		return gen_ent.NewGenerator(workDir)
 	case GeneratorTypeYo:
 		return gen_yo.NewGenerator(workDir)
+	case GeneratorTypeStructs:
+		return gen_structs.NewGenerator(workDir, targetDir)
 	default:
 		return nil, fmt.Errorf("unrecognized generator type: %s", typ)
 	}

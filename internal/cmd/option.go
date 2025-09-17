@@ -18,6 +18,7 @@ type Options struct {
 	useContext       bool
 	useValueModifier bool
 	config           string
+	targetDir        string
 }
 
 func (o *Options) packageDir() string {
@@ -45,11 +46,12 @@ func (o *Options) buildGenOptions() []gen.OptionFunc {
 type GeneratorType string
 
 const (
-	GeneratorTypeYo  GeneratorType = "yo"
-	GeneratorTypeEnt GeneratorType = "ent"
+	GeneratorTypeYo      GeneratorType = "yo"
+	GeneratorTypeEnt     GeneratorType = "ent"
+	GeneratorTypeStructs GeneratorType = "structs"
 )
 
-var generatorTypes = []GeneratorType{GeneratorTypeYo, GeneratorTypeEnt}
+var generatorTypes = []GeneratorType{GeneratorTypeYo, GeneratorTypeEnt, GeneratorTypeStructs}
 
 func (t GeneratorType) Validate() error {
 	if t == "" {

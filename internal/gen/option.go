@@ -4,6 +4,7 @@ type option struct {
 	packageName      string // default: "fixture"
 	useContext       bool
 	useValueModifier bool
+	targetDir        string
 }
 
 func defaultOption() *option {
@@ -11,6 +12,7 @@ func defaultOption() *option {
 		packageName:      "fixture",
 		useContext:       false,
 		useValueModifier: false,
+		targetDir:        "",
 	}
 }
 
@@ -37,5 +39,11 @@ func UseContext() OptionFunc {
 func UseValueModifier() OptionFunc {
 	return func(o *option) {
 		o.useValueModifier = true
+	}
+}
+
+func TargetDir(targetDir string) OptionFunc {
+	return func(o *option) {
+		o.targetDir = targetDir
 	}
 }

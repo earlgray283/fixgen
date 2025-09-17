@@ -1,0 +1,18 @@
+defaultValuePolicy:
+  type: zero
+structs:
+  Todo:
+    fields:
+      Title:
+        overwrite: true
+  User:
+    fields:
+      IconURL:
+        expr: fmt.Sprintf("http://example.com/%d", 123456)
+      Name:
+        value: Taro Yamada
+      UserType:
+        value: 1
+        isModifiedCond: m.UserType != 1
+imports:
+- package: fmt

@@ -28,9 +28,18 @@ func findAndReadDir(rootDir string, keyFunc func(d fs.DirEntry) bool) (string, [
 	}
 	dirPath := filepath.Dir(keyPath)
 
+	filepaths, err := ReadDir(dirPath)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to read dir: %+w", err)
+	}
+
+	return dirPath, filepaths, nil
+}
+
+func ReadDir(dirPath string) ([]string, error) {
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
 	filepaths := make([]string, 0, len(entries))
@@ -41,7 +50,7 @@ func findAndReadDir(rootDir string, keyFunc func(d fs.DirEntry) bool) (string, [
 		filepaths = append(filepaths, filepath.Join(dirPath, e.Name()))
 	}
 
-	return dirPath, filepaths, nil
+	return filepaths, nil
 }
 
 func findByKey(rootDir string, keyFunc func(d fs.DirEntry) bool) (string, error) {
