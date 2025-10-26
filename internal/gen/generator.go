@@ -2,6 +2,7 @@ package gen
 
 import (
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 
@@ -16,19 +17,17 @@ func GenerateWithFormat[G Generator](g G, c *config.Config, opts ...OptionFunc) 
 	opt := defaultOption()
 	opt.applyOptionFuncs(opts...)
 
-	defaultValueMap := defaultValueMapRandv2
 	useMathv1 := false
+	defaultValueMap := getDefaultValueMap(config.DefaultValuePolicyTypeRandv2)
 	if c.DefaultValuePolicy != nil {
-		switch c.DefaultValuePolicy.Type {
-		case config.DefaultValuePolicyTypeRandv1:
-			defaultValueMap = defaultValueMapRandv1
+		if c.DefaultValuePolicy.Type == config.DefaultValuePolicyTypeRandv1 {
 			useMathv1 = true
-		case config.DefaultValuePolicyTypeRandv2:
-			defaultValueMap = defaultValueMapRandv2
-		case config.DefaultValuePolicyTypeZero:
-			defaultValueMap = defaultValueMapZero
+		}
+		switch c.DefaultValuePolicy.Type {
 		case config.DefaultValuePolicyTypeCustom:
 			defaultValueMap = c.DefaultValuePolicy.CustomMap
+		default:
+			defaultValueMap = getDefaultValueMap(c.DefaultValuePolicy.Type)
 		}
 	}
 
@@ -102,30 +101,42 @@ func Format(content []byte) ([]byte, error) {
 	return formated, nil
 }
 
+func getDefaultValueMap(typ config.DefaultValuePolicyType) map[string]string {
+	mp := maps.Clone(defaultValueMap)
+	target := defaultValueMapRandv2
+	switch typ {
+	case config.DefaultValuePolicyTypeRandv1:
+		target = defaultValueMapRandv1
+	case config.DefaultValuePolicyTypeZero:
+		target = defaultValueMapZero
+	}
+	maps.Copy(mp, target)
+	return mp
+}
+
 var (
-	defaultValueMapRandv2 = map[string]string{
-		"int32":     "rand.Int32()",
-		"int64":     "rand.Int64()",
-		"uint32":    "rand.Uint32()",
-		"uint64":    "rand.Uint64()",
-		"float32":   "rand.Float32()",
-		"float64":   "rand.Float64()",
+	defaultValueMap = map[string]string{
 		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
 		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
 		"bool":      "false",
 		"time.Time": "time.Now()",
+		"uuid.UUID": "uuid.New()",
+	}
+	defaultValueMapRandv2 = map[string]string{
+		"int32":   "rand.Int32()",
+		"int64":   "rand.Int64()",
+		"uint32":  "rand.Uint32()",
+		"uint64":  "rand.Uint64()",
+		"float32": "rand.Float32()",
+		"float64": "rand.Float64()",
 	}
 	defaultValueMapRandv1 = map[string]string{
-		"int32":     "rand.Int31()",
-		"int64":     "rand.Int63()",
-		"uint32":    "rand.Uint31()",
-		"uint64":    "rand.Uint63()",
-		"float32":   "rand.Float32()",
-		"float64":   "rand.Float64()",
-		"string":    "lo.RandomString(32, lo.AlphanumericCharset)",
-		"[]byte":    "[]byte(lo.RandomString(32, lo.AlphanumericCharset))",
-		"bool":      "false",
-		"time.Time": "time.Now()",
+		"int32":   "rand.Int31()",
+		"int64":   "rand.Int63()",
+		"uint32":  "rand.Uint31()",
+		"uint64":  "rand.Uint63()",
+		"float32": "rand.Float32()",
+		"float64": "rand.Float64()",
 	}
 	defaultValueMapZero = map[string]string{
 		"int32":     `0`,

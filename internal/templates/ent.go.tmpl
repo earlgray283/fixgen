@@ -1,7 +1,7 @@
 func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m {{ if not .UseValueModifier }}*{{ end }}ent_gen.{{.TableName}}, opts ...func(*ent_gen.{{.TableName}}Create)) *ent_gen.{{.TableName}} {
   t.Helper()
 
-  tbl := &ent_gen.{{.TableName}} { 
+  tbl := &ent_gen.{{.TableName}} {
     {{ range $i, $f := .Fields -}}
       {{ if $f.DefaultValue }} {{ $f.Name }}: {{ $f.DefaultValue }}, {{ if $f.IsOverwritten }} // {{ $f.Name }} is overwritten {{ end }}
       {{ else if $f.HasDefaultOnCreate }} // {{ $f.Name }} has default on create
@@ -12,7 +12,6 @@ func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m {{ if not .UseValu
     {{- end -}}
   }
 
-  builder := db.{{.TableName}}.Create()
   {{ range $i, $f := .Fields -}}
   {{ if $f.MustOverwrite -}} tbl.{{ $f.Name }} = m.{{ $f.Name }} // must overwrite
   {{ else -}}
@@ -22,10 +21,21 @@ func Create{{.TableName}}(t *testing.T, db *ent_gen.Client, m {{ if not .UseValu
     {{- else if $f.IsNillable }} m.{{ $f.Name }} != nil
     {{- else }} isModified(m.{{ $f.Name }})
     {{- end -}} {
-      builder = builder.Set{{ $f.Name }}({{- if $f.IsNillable }}*{{ end -}}tbl.{{ $f.Name }})
+      tbl.{{ $f.Name }} = m.{{ $f.Name }}
   }
   {{ end -}}
-  {{- end -}}
+  {{- end }}
+
+  builder := db.{{.TableName}}.Create()
+  {{ range $i, $f := .Fields -}}
+  {{ if $f.IsNillable -}}
+    if tbl.{{ $f.Name }} != nil {
+      builder.Set{{ $f.Name }}(*tbl.{{ $f.Name }})
+    }
+  {{- else -}}
+    builder.Set{{ $f.Name }}({{- if $f.IsNillable }}*{{ end -}}tbl.{{ $f.Name }})
+  {{- end }}
+  {{ end }}
   for _, opt := range opts {
     opt(builder)
   }

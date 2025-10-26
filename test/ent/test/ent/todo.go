@@ -77,7 +77,7 @@ func (*Todo) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Todo fields.
-func (t *Todo) assignValues(columns []string, values []any) error {
+func (_m *Todo) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -88,48 +88,48 @@ func (t *Todo) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			t.ID = int64(value.Int64)
+			_m.ID = int64(value.Int64)
 		case todo.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
-				t.Title = value.String
+				_m.Title = value.String
 			}
 		case todo.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				t.Description = value.String
+				_m.Description = value.String
 			}
 		case todo.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				t.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case todo.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				t.UpdatedAt = new(time.Time)
-				*t.UpdatedAt = value.Time
+				_m.UpdatedAt = new(time.Time)
+				*_m.UpdatedAt = value.Time
 			}
 		case todo.FieldDoneAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field done_at", values[i])
 			} else if value.Valid {
-				t.DoneAt = new(time.Time)
-				*t.DoneAt = value.Time
+				_m.DoneAt = new(time.Time)
+				*_m.DoneAt = value.Time
 			}
 		case todo.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_todos", value)
 			} else if value.Valid {
-				t.user_todos = new(int64)
-				*t.user_todos = int64(value.Int64)
+				_m.user_todos = new(int64)
+				*_m.user_todos = int64(value.Int64)
 			}
 		default:
-			t.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -137,53 +137,53 @@ func (t *Todo) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Todo.
 // This includes values selected through modifiers, order, etc.
-func (t *Todo) Value(name string) (ent.Value, error) {
-	return t.selectValues.Get(name)
+func (_m *Todo) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUsers queries the "users" edge of the Todo entity.
-func (t *Todo) QueryUsers() *UserQuery {
-	return NewTodoClient(t.config).QueryUsers(t)
+func (_m *Todo) QueryUsers() *UserQuery {
+	return NewTodoClient(_m.config).QueryUsers(_m)
 }
 
 // Update returns a builder for updating this Todo.
 // Note that you need to call Todo.Unwrap() before calling this method if this Todo
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (t *Todo) Update() *TodoUpdateOne {
-	return NewTodoClient(t.config).UpdateOne(t)
+func (_m *Todo) Update() *TodoUpdateOne {
+	return NewTodoClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Todo entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (t *Todo) Unwrap() *Todo {
-	_tx, ok := t.config.driver.(*txDriver)
+func (_m *Todo) Unwrap() *Todo {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Todo is not a transactional entity")
 	}
-	t.config.driver = _tx.drv
-	return t
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (t *Todo) String() string {
+func (_m *Todo) String() string {
 	var builder strings.Builder
 	builder.WriteString("Todo(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", t.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("title=")
-	builder.WriteString(t.Title)
+	builder.WriteString(_m.Title)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
-	builder.WriteString(t.Description)
+	builder.WriteString(_m.Description)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(t.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := t.UpdatedAt; v != nil {
+	if v := _m.UpdatedAt; v != nil {
 		builder.WriteString("updated_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := t.DoneAt; v != nil {
+	if v := _m.DoneAt; v != nil {
 		builder.WriteString("done_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}

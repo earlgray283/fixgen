@@ -24,130 +24,130 @@ type TodoUpdate struct {
 }
 
 // Where appends a list predicates to the TodoUpdate builder.
-func (tu *TodoUpdate) Where(ps ...predicate.Todo) *TodoUpdate {
-	tu.mutation.Where(ps...)
-	return tu
+func (_u *TodoUpdate) Where(ps ...predicate.Todo) *TodoUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetTitle sets the "title" field.
-func (tu *TodoUpdate) SetTitle(s string) *TodoUpdate {
-	tu.mutation.SetTitle(s)
-	return tu
+func (_u *TodoUpdate) SetTitle(v string) *TodoUpdate {
+	_u.mutation.SetTitle(v)
+	return _u
 }
 
 // SetNillableTitle sets the "title" field if the given value is not nil.
-func (tu *TodoUpdate) SetNillableTitle(s *string) *TodoUpdate {
-	if s != nil {
-		tu.SetTitle(*s)
+func (_u *TodoUpdate) SetNillableTitle(v *string) *TodoUpdate {
+	if v != nil {
+		_u.SetTitle(*v)
 	}
-	return tu
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (tu *TodoUpdate) SetDescription(s string) *TodoUpdate {
-	tu.mutation.SetDescription(s)
-	return tu
+func (_u *TodoUpdate) SetDescription(v string) *TodoUpdate {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (tu *TodoUpdate) SetNillableDescription(s *string) *TodoUpdate {
-	if s != nil {
-		tu.SetDescription(*s)
+func (_u *TodoUpdate) SetNillableDescription(v *string) *TodoUpdate {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return tu
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (tu *TodoUpdate) ClearDescription() *TodoUpdate {
-	tu.mutation.ClearDescription()
-	return tu
+func (_u *TodoUpdate) ClearDescription() *TodoUpdate {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (tu *TodoUpdate) SetCreatedAt(t time.Time) *TodoUpdate {
-	tu.mutation.SetCreatedAt(t)
-	return tu
+func (_u *TodoUpdate) SetCreatedAt(v time.Time) *TodoUpdate {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (tu *TodoUpdate) SetNillableCreatedAt(t *time.Time) *TodoUpdate {
-	if t != nil {
-		tu.SetCreatedAt(*t)
+func (_u *TodoUpdate) SetNillableCreatedAt(v *time.Time) *TodoUpdate {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return tu
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (tu *TodoUpdate) SetUpdatedAt(t time.Time) *TodoUpdate {
-	tu.mutation.SetUpdatedAt(t)
-	return tu
+func (_u *TodoUpdate) SetUpdatedAt(v time.Time) *TodoUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (tu *TodoUpdate) ClearUpdatedAt() *TodoUpdate {
-	tu.mutation.ClearUpdatedAt()
-	return tu
+func (_u *TodoUpdate) ClearUpdatedAt() *TodoUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetDoneAt sets the "done_at" field.
-func (tu *TodoUpdate) SetDoneAt(t time.Time) *TodoUpdate {
-	tu.mutation.SetDoneAt(t)
-	return tu
+func (_u *TodoUpdate) SetDoneAt(v time.Time) *TodoUpdate {
+	_u.mutation.SetDoneAt(v)
+	return _u
 }
 
 // SetNillableDoneAt sets the "done_at" field if the given value is not nil.
-func (tu *TodoUpdate) SetNillableDoneAt(t *time.Time) *TodoUpdate {
-	if t != nil {
-		tu.SetDoneAt(*t)
+func (_u *TodoUpdate) SetNillableDoneAt(v *time.Time) *TodoUpdate {
+	if v != nil {
+		_u.SetDoneAt(*v)
 	}
-	return tu
+	return _u
 }
 
 // ClearDoneAt clears the value of the "done_at" field.
-func (tu *TodoUpdate) ClearDoneAt() *TodoUpdate {
-	tu.mutation.ClearDoneAt()
-	return tu
+func (_u *TodoUpdate) ClearDoneAt() *TodoUpdate {
+	_u.mutation.ClearDoneAt()
+	return _u
 }
 
 // SetUsersID sets the "users" edge to the User entity by ID.
-func (tu *TodoUpdate) SetUsersID(id int64) *TodoUpdate {
-	tu.mutation.SetUsersID(id)
-	return tu
+func (_u *TodoUpdate) SetUsersID(id int64) *TodoUpdate {
+	_u.mutation.SetUsersID(id)
+	return _u
 }
 
 // SetNillableUsersID sets the "users" edge to the User entity by ID if the given value is not nil.
-func (tu *TodoUpdate) SetNillableUsersID(id *int64) *TodoUpdate {
+func (_u *TodoUpdate) SetNillableUsersID(id *int64) *TodoUpdate {
 	if id != nil {
-		tu = tu.SetUsersID(*id)
+		_u = _u.SetUsersID(*id)
 	}
-	return tu
+	return _u
 }
 
 // SetUsers sets the "users" edge to the User entity.
-func (tu *TodoUpdate) SetUsers(u *User) *TodoUpdate {
-	return tu.SetUsersID(u.ID)
+func (_u *TodoUpdate) SetUsers(v *User) *TodoUpdate {
+	return _u.SetUsersID(v.ID)
 }
 
 // Mutation returns the TodoMutation object of the builder.
-func (tu *TodoUpdate) Mutation() *TodoMutation {
-	return tu.mutation
+func (_u *TodoUpdate) Mutation() *TodoMutation {
+	return _u.mutation
 }
 
 // ClearUsers clears the "users" edge to the User entity.
-func (tu *TodoUpdate) ClearUsers() *TodoUpdate {
-	tu.mutation.ClearUsers()
-	return tu
+func (_u *TodoUpdate) ClearUsers() *TodoUpdate {
+	_u.mutation.ClearUsers()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (tu *TodoUpdate) Save(ctx context.Context) (int, error) {
-	tu.defaults()
-	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
+func (_u *TodoUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tu *TodoUpdate) SaveX(ctx context.Context) int {
-	affected, err := tu.Save(ctx)
+func (_u *TodoUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -155,60 +155,60 @@ func (tu *TodoUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (tu *TodoUpdate) Exec(ctx context.Context) error {
-	_, err := tu.Save(ctx)
+func (_u *TodoUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tu *TodoUpdate) ExecX(ctx context.Context) {
-	if err := tu.Exec(ctx); err != nil {
+func (_u *TodoUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (tu *TodoUpdate) defaults() {
-	if _, ok := tu.mutation.UpdatedAt(); !ok && !tu.mutation.UpdatedAtCleared() {
+func (_u *TodoUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := todo.UpdateDefaultUpdatedAt()
-		tu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *TodoUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(todo.Table, todo.Columns, sqlgraph.NewFieldSpec(todo.FieldID, field.TypeInt64))
-	if ps := tu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := tu.mutation.Title(); ok {
+	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := tu.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(todo.FieldDescription, field.TypeString, value)
 	}
-	if tu.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(todo.FieldDescription, field.TypeString)
 	}
-	if value, ok := tu.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(todo.FieldCreatedAt, field.TypeTime, value)
 	}
-	if value, ok := tu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(todo.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if tu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(todo.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := tu.mutation.DoneAt(); ok {
+	if value, ok := _u.mutation.DoneAt(); ok {
 		_spec.SetField(todo.FieldDoneAt, field.TypeTime, value)
 	}
-	if tu.mutation.DoneAtCleared() {
+	if _u.mutation.DoneAtCleared() {
 		_spec.ClearField(todo.FieldDoneAt, field.TypeTime)
 	}
-	if tu.mutation.UsersCleared() {
+	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -221,7 +221,7 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -237,7 +237,7 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{todo.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -245,8 +245,8 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	tu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // TodoUpdateOne is the builder for updating a single Todo entity.
@@ -258,137 +258,137 @@ type TodoUpdateOne struct {
 }
 
 // SetTitle sets the "title" field.
-func (tuo *TodoUpdateOne) SetTitle(s string) *TodoUpdateOne {
-	tuo.mutation.SetTitle(s)
-	return tuo
+func (_u *TodoUpdateOne) SetTitle(v string) *TodoUpdateOne {
+	_u.mutation.SetTitle(v)
+	return _u
 }
 
 // SetNillableTitle sets the "title" field if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableTitle(s *string) *TodoUpdateOne {
-	if s != nil {
-		tuo.SetTitle(*s)
+func (_u *TodoUpdateOne) SetNillableTitle(v *string) *TodoUpdateOne {
+	if v != nil {
+		_u.SetTitle(*v)
 	}
-	return tuo
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (tuo *TodoUpdateOne) SetDescription(s string) *TodoUpdateOne {
-	tuo.mutation.SetDescription(s)
-	return tuo
+func (_u *TodoUpdateOne) SetDescription(v string) *TodoUpdateOne {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableDescription(s *string) *TodoUpdateOne {
-	if s != nil {
-		tuo.SetDescription(*s)
+func (_u *TodoUpdateOne) SetNillableDescription(v *string) *TodoUpdateOne {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return tuo
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (tuo *TodoUpdateOne) ClearDescription() *TodoUpdateOne {
-	tuo.mutation.ClearDescription()
-	return tuo
+func (_u *TodoUpdateOne) ClearDescription() *TodoUpdateOne {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (tuo *TodoUpdateOne) SetCreatedAt(t time.Time) *TodoUpdateOne {
-	tuo.mutation.SetCreatedAt(t)
-	return tuo
+func (_u *TodoUpdateOne) SetCreatedAt(v time.Time) *TodoUpdateOne {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableCreatedAt(t *time.Time) *TodoUpdateOne {
-	if t != nil {
-		tuo.SetCreatedAt(*t)
+func (_u *TodoUpdateOne) SetNillableCreatedAt(v *time.Time) *TodoUpdateOne {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return tuo
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (tuo *TodoUpdateOne) SetUpdatedAt(t time.Time) *TodoUpdateOne {
-	tuo.mutation.SetUpdatedAt(t)
-	return tuo
+func (_u *TodoUpdateOne) SetUpdatedAt(v time.Time) *TodoUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (tuo *TodoUpdateOne) ClearUpdatedAt() *TodoUpdateOne {
-	tuo.mutation.ClearUpdatedAt()
-	return tuo
+func (_u *TodoUpdateOne) ClearUpdatedAt() *TodoUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetDoneAt sets the "done_at" field.
-func (tuo *TodoUpdateOne) SetDoneAt(t time.Time) *TodoUpdateOne {
-	tuo.mutation.SetDoneAt(t)
-	return tuo
+func (_u *TodoUpdateOne) SetDoneAt(v time.Time) *TodoUpdateOne {
+	_u.mutation.SetDoneAt(v)
+	return _u
 }
 
 // SetNillableDoneAt sets the "done_at" field if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableDoneAt(t *time.Time) *TodoUpdateOne {
-	if t != nil {
-		tuo.SetDoneAt(*t)
+func (_u *TodoUpdateOne) SetNillableDoneAt(v *time.Time) *TodoUpdateOne {
+	if v != nil {
+		_u.SetDoneAt(*v)
 	}
-	return tuo
+	return _u
 }
 
 // ClearDoneAt clears the value of the "done_at" field.
-func (tuo *TodoUpdateOne) ClearDoneAt() *TodoUpdateOne {
-	tuo.mutation.ClearDoneAt()
-	return tuo
+func (_u *TodoUpdateOne) ClearDoneAt() *TodoUpdateOne {
+	_u.mutation.ClearDoneAt()
+	return _u
 }
 
 // SetUsersID sets the "users" edge to the User entity by ID.
-func (tuo *TodoUpdateOne) SetUsersID(id int64) *TodoUpdateOne {
-	tuo.mutation.SetUsersID(id)
-	return tuo
+func (_u *TodoUpdateOne) SetUsersID(id int64) *TodoUpdateOne {
+	_u.mutation.SetUsersID(id)
+	return _u
 }
 
 // SetNillableUsersID sets the "users" edge to the User entity by ID if the given value is not nil.
-func (tuo *TodoUpdateOne) SetNillableUsersID(id *int64) *TodoUpdateOne {
+func (_u *TodoUpdateOne) SetNillableUsersID(id *int64) *TodoUpdateOne {
 	if id != nil {
-		tuo = tuo.SetUsersID(*id)
+		_u = _u.SetUsersID(*id)
 	}
-	return tuo
+	return _u
 }
 
 // SetUsers sets the "users" edge to the User entity.
-func (tuo *TodoUpdateOne) SetUsers(u *User) *TodoUpdateOne {
-	return tuo.SetUsersID(u.ID)
+func (_u *TodoUpdateOne) SetUsers(v *User) *TodoUpdateOne {
+	return _u.SetUsersID(v.ID)
 }
 
 // Mutation returns the TodoMutation object of the builder.
-func (tuo *TodoUpdateOne) Mutation() *TodoMutation {
-	return tuo.mutation
+func (_u *TodoUpdateOne) Mutation() *TodoMutation {
+	return _u.mutation
 }
 
 // ClearUsers clears the "users" edge to the User entity.
-func (tuo *TodoUpdateOne) ClearUsers() *TodoUpdateOne {
-	tuo.mutation.ClearUsers()
-	return tuo
+func (_u *TodoUpdateOne) ClearUsers() *TodoUpdateOne {
+	_u.mutation.ClearUsers()
+	return _u
 }
 
 // Where appends a list predicates to the TodoUpdate builder.
-func (tuo *TodoUpdateOne) Where(ps ...predicate.Todo) *TodoUpdateOne {
-	tuo.mutation.Where(ps...)
-	return tuo
+func (_u *TodoUpdateOne) Where(ps ...predicate.Todo) *TodoUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (tuo *TodoUpdateOne) Select(field string, fields ...string) *TodoUpdateOne {
-	tuo.fields = append([]string{field}, fields...)
-	return tuo
+func (_u *TodoUpdateOne) Select(field string, fields ...string) *TodoUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Todo entity.
-func (tuo *TodoUpdateOne) Save(ctx context.Context) (*Todo, error) {
-	tuo.defaults()
-	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
+func (_u *TodoUpdateOne) Save(ctx context.Context) (*Todo, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tuo *TodoUpdateOne) SaveX(ctx context.Context) *Todo {
-	node, err := tuo.Save(ctx)
+func (_u *TodoUpdateOne) SaveX(ctx context.Context) *Todo {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -396,34 +396,34 @@ func (tuo *TodoUpdateOne) SaveX(ctx context.Context) *Todo {
 }
 
 // Exec executes the query on the entity.
-func (tuo *TodoUpdateOne) Exec(ctx context.Context) error {
-	_, err := tuo.Save(ctx)
+func (_u *TodoUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tuo *TodoUpdateOne) ExecX(ctx context.Context) {
-	if err := tuo.Exec(ctx); err != nil {
+func (_u *TodoUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (tuo *TodoUpdateOne) defaults() {
-	if _, ok := tuo.mutation.UpdatedAt(); !ok && !tuo.mutation.UpdatedAtCleared() {
+func (_u *TodoUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := todo.UpdateDefaultUpdatedAt()
-		tuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) {
+func (_u *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) {
 	_spec := sqlgraph.NewUpdateSpec(todo.Table, todo.Columns, sqlgraph.NewFieldSpec(todo.FieldID, field.TypeInt64))
-	id, ok := tuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Todo.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := tuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, todo.FieldID)
 		for _, f := range fields {
@@ -435,38 +435,38 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 			}
 		}
 	}
-	if ps := tuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := tuo.mutation.Title(); ok {
+	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := tuo.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(todo.FieldDescription, field.TypeString, value)
 	}
-	if tuo.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(todo.FieldDescription, field.TypeString)
 	}
-	if value, ok := tuo.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(todo.FieldCreatedAt, field.TypeTime, value)
 	}
-	if value, ok := tuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(todo.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if tuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(todo.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := tuo.mutation.DoneAt(); ok {
+	if value, ok := _u.mutation.DoneAt(); ok {
 		_spec.SetField(todo.FieldDoneAt, field.TypeTime, value)
 	}
-	if tuo.mutation.DoneAtCleared() {
+	if _u.mutation.DoneAtCleared() {
 		_spec.ClearField(todo.FieldDoneAt, field.TypeTime)
 	}
-	if tuo.mutation.UsersCleared() {
+	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -479,7 +479,7 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -495,10 +495,10 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Todo{config: tuo.config}
+	_node = &Todo{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, tuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{todo.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -506,6 +506,6 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 		}
 		return nil, err
 	}
-	tuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

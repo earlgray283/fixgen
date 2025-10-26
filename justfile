@@ -22,6 +22,9 @@ update-example: install
 gen-yo: run-spanner-image
     @cd ./test/yo/test && go tool yo test-project test-instance test-db -o ./models
 
+gen-ent:
+    @cd ./test/ent/test && go generate ./ent
+
 spanner_image_name := "fixgen-spanner"
 spanner_container_name := "fixgen-spanner"
 spanner_schema_path := "./test/yo/test/schema.sql"

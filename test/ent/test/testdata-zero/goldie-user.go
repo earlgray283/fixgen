@@ -7,35 +7,51 @@ import (
 	ent_gen "ent/ent"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func CreateUser(t *testing.T, db *ent_gen.Client, m *ent_gen.User, opts ...func(*ent_gen.UserCreate)) *ent_gen.User {
 	t.Helper()
 
 	tbl := &ent_gen.User{
-		ID:        0,
-		Name:      "Taro Yamada", // Name is overwritten
-		Bytes:     nil,
-		CreatedAt: time.Time{},
+		ID:         0,
+		ExternalID: uuid.New(),
+		Name:       "Taro Yamada", // Name is overwritten
+		Bytes:      nil,
+		CreatedAt:  time.Time{},
 		// UpdatedAt is nillable
 	}
 
-	builder := db.User.Create()
 	if isModified(m.ID) {
-		builder = builder.SetID(tbl.ID)
+		tbl.ID = m.ID
+	}
+	if isModified(m.ExternalID) {
+		tbl.ExternalID = m.ExternalID
 	}
 	if isModified(m.Name) {
-		builder = builder.SetName(tbl.Name)
+		tbl.Name = m.Name
 	}
 	if len(m.Bytes) > 0 {
-		builder = builder.SetBytes(tbl.Bytes)
+		tbl.Bytes = m.Bytes
 	}
 	if isModified(m.CreatedAt) {
-		builder = builder.SetCreatedAt(tbl.CreatedAt)
+		tbl.CreatedAt = m.CreatedAt
 	}
 	if m.UpdatedAt != nil {
-		builder = builder.SetUpdatedAt(*tbl.UpdatedAt)
+		tbl.UpdatedAt = m.UpdatedAt
 	}
+
+	builder := db.User.Create()
+	builder.SetID(tbl.ID)
+	builder.SetExternalID(tbl.ExternalID)
+	builder.SetName(tbl.Name)
+	builder.SetBytes(tbl.Bytes)
+	builder.SetCreatedAt(tbl.CreatedAt)
+	if tbl.UpdatedAt != nil {
+		builder.SetUpdatedAt(*tbl.UpdatedAt)
+	}
+
 	for _, opt := range opts {
 		opt(builder)
 	}

@@ -22,106 +22,106 @@ type TodoCreate struct {
 }
 
 // SetTitle sets the "title" field.
-func (tc *TodoCreate) SetTitle(s string) *TodoCreate {
-	tc.mutation.SetTitle(s)
-	return tc
+func (_c *TodoCreate) SetTitle(v string) *TodoCreate {
+	_c.mutation.SetTitle(v)
+	return _c
 }
 
 // SetDescription sets the "description" field.
-func (tc *TodoCreate) SetDescription(s string) *TodoCreate {
-	tc.mutation.SetDescription(s)
-	return tc
+func (_c *TodoCreate) SetDescription(v string) *TodoCreate {
+	_c.mutation.SetDescription(v)
+	return _c
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableDescription(s *string) *TodoCreate {
-	if s != nil {
-		tc.SetDescription(*s)
+func (_c *TodoCreate) SetNillableDescription(v *string) *TodoCreate {
+	if v != nil {
+		_c.SetDescription(*v)
 	}
-	return tc
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (tc *TodoCreate) SetCreatedAt(t time.Time) *TodoCreate {
-	tc.mutation.SetCreatedAt(t)
-	return tc
+func (_c *TodoCreate) SetCreatedAt(v time.Time) *TodoCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableCreatedAt(t *time.Time) *TodoCreate {
-	if t != nil {
-		tc.SetCreatedAt(*t)
+func (_c *TodoCreate) SetNillableCreatedAt(v *time.Time) *TodoCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return tc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (tc *TodoCreate) SetUpdatedAt(t time.Time) *TodoCreate {
-	tc.mutation.SetUpdatedAt(t)
-	return tc
+func (_c *TodoCreate) SetUpdatedAt(v time.Time) *TodoCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableUpdatedAt(t *time.Time) *TodoCreate {
-	if t != nil {
-		tc.SetUpdatedAt(*t)
+func (_c *TodoCreate) SetNillableUpdatedAt(v *time.Time) *TodoCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return tc
+	return _c
 }
 
 // SetDoneAt sets the "done_at" field.
-func (tc *TodoCreate) SetDoneAt(t time.Time) *TodoCreate {
-	tc.mutation.SetDoneAt(t)
-	return tc
+func (_c *TodoCreate) SetDoneAt(v time.Time) *TodoCreate {
+	_c.mutation.SetDoneAt(v)
+	return _c
 }
 
 // SetNillableDoneAt sets the "done_at" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableDoneAt(t *time.Time) *TodoCreate {
-	if t != nil {
-		tc.SetDoneAt(*t)
+func (_c *TodoCreate) SetNillableDoneAt(v *time.Time) *TodoCreate {
+	if v != nil {
+		_c.SetDoneAt(*v)
 	}
-	return tc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (tc *TodoCreate) SetID(i int64) *TodoCreate {
-	tc.mutation.SetID(i)
-	return tc
+func (_c *TodoCreate) SetID(v int64) *TodoCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetUsersID sets the "users" edge to the User entity by ID.
-func (tc *TodoCreate) SetUsersID(id int64) *TodoCreate {
-	tc.mutation.SetUsersID(id)
-	return tc
+func (_c *TodoCreate) SetUsersID(id int64) *TodoCreate {
+	_c.mutation.SetUsersID(id)
+	return _c
 }
 
 // SetNillableUsersID sets the "users" edge to the User entity by ID if the given value is not nil.
-func (tc *TodoCreate) SetNillableUsersID(id *int64) *TodoCreate {
+func (_c *TodoCreate) SetNillableUsersID(id *int64) *TodoCreate {
 	if id != nil {
-		tc = tc.SetUsersID(*id)
+		_c = _c.SetUsersID(*id)
 	}
-	return tc
+	return _c
 }
 
 // SetUsers sets the "users" edge to the User entity.
-func (tc *TodoCreate) SetUsers(u *User) *TodoCreate {
-	return tc.SetUsersID(u.ID)
+func (_c *TodoCreate) SetUsers(v *User) *TodoCreate {
+	return _c.SetUsersID(v.ID)
 }
 
 // Mutation returns the TodoMutation object of the builder.
-func (tc *TodoCreate) Mutation() *TodoMutation {
-	return tc.mutation
+func (_c *TodoCreate) Mutation() *TodoMutation {
+	return _c.mutation
 }
 
 // Save creates the Todo in the database.
-func (tc *TodoCreate) Save(ctx context.Context) (*Todo, error) {
-	tc.defaults()
-	return withHooks(ctx, tc.sqlSave, tc.mutation, tc.hooks)
+func (_c *TodoCreate) Save(ctx context.Context) (*Todo, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (tc *TodoCreate) SaveX(ctx context.Context) *Todo {
-	v, err := tc.Save(ctx)
+func (_c *TodoCreate) SaveX(ctx context.Context) *Todo {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -129,43 +129,43 @@ func (tc *TodoCreate) SaveX(ctx context.Context) *Todo {
 }
 
 // Exec executes the query.
-func (tc *TodoCreate) Exec(ctx context.Context) error {
-	_, err := tc.Save(ctx)
+func (_c *TodoCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tc *TodoCreate) ExecX(ctx context.Context) {
-	if err := tc.Exec(ctx); err != nil {
+func (_c *TodoCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (tc *TodoCreate) defaults() {
-	if _, ok := tc.mutation.CreatedAt(); !ok {
+func (_c *TodoCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := todo.DefaultCreatedAt()
-		tc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (tc *TodoCreate) check() error {
-	if _, ok := tc.mutation.Title(); !ok {
+func (_c *TodoCreate) check() error {
+	if _, ok := _c.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Todo.title"`)}
 	}
-	if _, ok := tc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Todo.created_at"`)}
 	}
 	return nil
 }
 
-func (tc *TodoCreate) sqlSave(ctx context.Context) (*Todo, error) {
-	if err := tc.check(); err != nil {
+func (_c *TodoCreate) sqlSave(ctx context.Context) (*Todo, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := tc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, tc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -175,41 +175,41 @@ func (tc *TodoCreate) sqlSave(ctx context.Context) (*Todo, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int64(id)
 	}
-	tc.mutation.id = &_node.ID
-	tc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
+func (_c *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Todo{config: tc.config}
+		_node = &Todo{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(todo.Table, sqlgraph.NewFieldSpec(todo.FieldID, field.TypeInt64))
 	)
-	if id, ok := tc.mutation.ID(); ok {
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := tc.mutation.Title(); ok {
+	if value, ok := _c.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
-	if value, ok := tc.mutation.Description(); ok {
+	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(todo.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := tc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(todo.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := tc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(todo.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = &value
 	}
-	if value, ok := tc.mutation.DoneAt(); ok {
+	if value, ok := _c.mutation.DoneAt(); ok {
 		_spec.SetField(todo.FieldDoneAt, field.TypeTime, value)
 		_node.DoneAt = &value
 	}
-	if nodes := tc.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -237,16 +237,16 @@ type TodoCreateBulk struct {
 }
 
 // Save creates the Todo entities in the database.
-func (tcb *TodoCreateBulk) Save(ctx context.Context) ([]*Todo, error) {
-	if tcb.err != nil {
-		return nil, tcb.err
+func (_c *TodoCreateBulk) Save(ctx context.Context) ([]*Todo, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
-	nodes := make([]*Todo, len(tcb.builders))
-	mutators := make([]Mutator, len(tcb.builders))
-	for i := range tcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Todo, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := tcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TodoMutation)
@@ -260,11 +260,11 @@ func (tcb *TodoCreateBulk) Save(ctx context.Context) ([]*Todo, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, tcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, tcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -288,7 +288,7 @@ func (tcb *TodoCreateBulk) Save(ctx context.Context) ([]*Todo, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, tcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -296,8 +296,8 @@ func (tcb *TodoCreateBulk) Save(ctx context.Context) ([]*Todo, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tcb *TodoCreateBulk) SaveX(ctx context.Context) []*Todo {
-	v, err := tcb.Save(ctx)
+func (_c *TodoCreateBulk) SaveX(ctx context.Context) []*Todo {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -305,14 +305,14 @@ func (tcb *TodoCreateBulk) SaveX(ctx context.Context) []*Todo {
 }
 
 // Exec executes the query.
-func (tcb *TodoCreateBulk) Exec(ctx context.Context) error {
-	_, err := tcb.Save(ctx)
+func (_c *TodoCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tcb *TodoCreateBulk) ExecX(ctx context.Context) {
-	if err := tcb.Exec(ctx); err != nil {
+func (_c *TodoCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
